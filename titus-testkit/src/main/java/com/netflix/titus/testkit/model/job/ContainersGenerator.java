@@ -78,7 +78,7 @@ public final class ContainersGenerator {
                 ContainerResources.newBuilder()
                         .withCpu(cpu)
                         .withMemoryMB((int) (cpu * ratio * 1024))
-                        .withDiskMB((int) (cpu * ratio * 2 * 1024))
+                        .withDiskMB((int) (cpu * ratio * 2 * 10_000))
                         .withNetworkMbps((int) (cpu * ratio * 128))
                         .build()
         );
@@ -117,7 +117,7 @@ public final class ContainersGenerator {
 
     private static DataGenerator<Triple<List<String>, List<String>, Map<String, String>>> executable() {
         DataGenerator<Pair<List<String>, List<String>>> entryPointAndCommands = DataGenerator.zip(
-                items(asList("sleep 100"), asList("echo 'Hello'")),
+                items(asList("/bin/sh", "-c"), asList("echo 'Hello'")),
                 items(Collections.<String>emptyList(), Collections.<String>emptyList())
         );
         DataGenerator<Map<String, String>> envs = items(

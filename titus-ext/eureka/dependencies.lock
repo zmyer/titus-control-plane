@@ -236,7 +236,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.9.2",
+            "locked": "1.9.3",
             "requested": "1.+"
         },
         "com.netflix.fenzo:fenzo-core": {
@@ -1186,7 +1186,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.9.2",
+            "locked": "1.9.3",
             "requested": "1.+"
         },
         "com.netflix.fenzo:fenzo-core": {
@@ -2136,7 +2136,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.9.2",
+            "locked": "1.9.3",
             "requested": "1.+"
         },
         "com.netflix.fenzo:fenzo-core": {
@@ -3150,7 +3150,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.9.2",
+            "locked": "1.9.3",
             "requested": "1.+"
         },
         "com.netflix.fenzo:fenzo-core": {
@@ -4101,7 +4101,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.9.2",
+            "locked": "1.9.3",
             "requested": "1.+"
         },
         "com.netflix.fenzo:fenzo-core": {
@@ -5173,7 +5173,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.9.2",
+            "locked": "1.9.3",
             "requested": "1.+"
         },
         "com.netflix.fenzo:fenzo-core": {
@@ -5729,13 +5729,13 @@
             ]
         },
         "net.bytebuddy:byte-buddy": {
-            "locked": "1.8.10",
+            "locked": "1.8.13",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
         },
         "net.bytebuddy:byte-buddy-agent": {
-            "locked": "1.8.10",
+            "locked": "1.8.13",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -6036,7 +6036,7 @@
             ]
         },
         "org.mockito:mockito-core": {
-            "locked": "2.19.0",
+            "locked": "2.19.1",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.titus:titus-testkit"
@@ -6572,7 +6572,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.9.2",
+            "locked": "1.9.3",
             "requested": "1.+"
         },
         "com.netflix.fenzo:fenzo-core": {
@@ -7128,13 +7128,13 @@
             ]
         },
         "net.bytebuddy:byte-buddy": {
-            "locked": "1.8.10",
+            "locked": "1.8.13",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
         },
         "net.bytebuddy:byte-buddy-agent": {
-            "locked": "1.8.10",
+            "locked": "1.8.13",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -7435,7 +7435,7 @@
             ]
         },
         "org.mockito:mockito-core": {
-            "locked": "2.19.0",
+            "locked": "2.19.1",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.titus:titus-testkit"
@@ -7971,7 +7971,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.9.2",
+            "locked": "1.9.3",
             "requested": "1.+"
         },
         "com.netflix.fenzo:fenzo-core": {
@@ -8527,13 +8527,13 @@
             ]
         },
         "net.bytebuddy:byte-buddy": {
-            "locked": "1.8.10",
+            "locked": "1.8.13",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
         },
         "net.bytebuddy:byte-buddy-agent": {
-            "locked": "1.8.10",
+            "locked": "1.8.13",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -8834,7 +8834,7 @@
             ]
         },
         "org.mockito:mockito-core": {
-            "locked": "2.19.0",
+            "locked": "2.19.1",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.titus:titus-testkit"
@@ -9371,7 +9371,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.9.2",
+            "locked": "1.9.3",
             "requested": "1.+"
         },
         "com.netflix.fenzo:fenzo-core": {
@@ -9927,13 +9927,13 @@
             ]
         },
         "net.bytebuddy:byte-buddy": {
-            "locked": "1.8.10",
+            "locked": "1.8.13",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
         },
         "net.bytebuddy:byte-buddy-agent": {
-            "locked": "1.8.10",
+            "locked": "1.8.13",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -10234,7 +10234,7 @@
             ]
         },
         "org.mockito:mockito-core": {
-            "locked": "2.19.0",
+            "locked": "2.19.1",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.titus:titus-testkit"
