@@ -87,7 +87,7 @@ public class JobSubmitAndControlNegativeTest extends BaseIntegrationTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        instanceGroupsScenarioBuilder.synchronizeWithCloud().template(InstanceGroupScenarioTemplates.basicSetupActivation());
+        instanceGroupsScenarioBuilder.synchronizeWithCloud().template(InstanceGroupScenarioTemplates.basicCloudActivation());
         client = titusStackResource.getGateway().getV3BlockingGrpcClient();
     }
 
@@ -296,18 +296,6 @@ public class JobSubmitAndControlNegativeTest extends BaseIntegrationTest {
                 "extensions.retryPolicy.initialDelayMs",
                 "extensions.retryPolicy.maxDelayMs"
         );
-    }
-
-    @Test
-    public void testSubmitJobsWithIdenticalJobGroupIdentityOnV2Engine() throws Exception {
-        JobDescriptor jobDescriptor = toGrpcJobDescriptor(JobDescriptorGenerator.oneTaskServiceJobDescriptor());
-        try {
-            client.createJob(jobDescriptor).getId();
-            client.createJob(jobDescriptor).getId();
-            fail("Expected test to fail");
-        } catch (StatusRuntimeException e) {
-            assertThat(e.getMessage()).containsPattern(Pattern.compile("job with group sequence.*exists"));
-        }
     }
 
     @Test

@@ -23,61 +23,43 @@ import com.google.common.base.Preconditions;
 import com.netflix.fenzo.TaskRequest;
 import com.netflix.fenzo.TaskTrackerState;
 import com.netflix.fenzo.VirtualMachineCurrentState;
-import com.netflix.titus.api.agent.service.AgentManagementService;
-import com.netflix.titus.api.agent.service.AgentStatusMonitor;
-import com.netflix.titus.common.runtime.TitusRuntime;
 import com.netflix.titus.common.util.guice.annotation.Activator;
-import com.netflix.titus.master.config.MasterConfiguration;
-import com.netflix.titus.master.scheduler.SchedulerConfiguration;
 import com.netflix.titus.master.scheduler.systemselector.SystemSelectorConstraintEvaluator;
 
 import static java.util.Arrays.asList;
 
 @Singleton
 public class DefaultSystemHardConstraint implements SystemHardConstraint {
-    private final MasterConfiguration config;
-    private final SchedulerConfiguration schedulerConfiguration;
-    private final AgentManagementService agentManagementService;
-    private final AgentStatusMonitor agentStatusMonitor;
-    private final TitusRuntime titusRuntime;
-    private final GlobalTaskLaunchingConstraintEvaluator globalTaskLaunchingConstraintEvaluator;
+
+    public static final String NAME = "DefaultSystemHardConstraint";
+
+    private final AgentManagementConstraint agentManagementConstraint;
+    private final AgentLaunchGuardConstraint agentLaunchGuardConstraint;
     private final SystemSelectorConstraintEvaluator systemSelectorConstraintEvaluator;
 
-    private CompositeGlobalConstraintEvaluator delegate;
+    private CompositeSystemConstraint delegate;
 
     @Inject
-    public DefaultSystemHardConstraint(MasterConfiguration config,
-                                       SchedulerConfiguration schedulerConfiguration,
-                                       AgentManagementService agentManagementService,
-                                       AgentStatusMonitor agentStatusMonitor,
-                                       TitusRuntime titusRuntime,
-                                       GlobalTaskLaunchingConstraintEvaluator globalTaskLaunchingConstraintEvaluator,
+    public DefaultSystemHardConstraint(AgentManagementConstraint agentManagementConstraint,
+                                       AgentLaunchGuardConstraint agentLaunchGuardConstraint,
                                        SystemSelectorConstraintEvaluator systemSelectorConstraintEvaluator) {
-        this.config = config;
-        this.schedulerConfiguration = schedulerConfiguration;
-        this.agentManagementService = agentManagementService;
-        this.agentStatusMonitor = agentStatusMonitor;
-        this.titusRuntime = titusRuntime;
-        this.globalTaskLaunchingConstraintEvaluator = globalTaskLaunchingConstraintEvaluator;
+        this.agentManagementConstraint = agentManagementConstraint;
+        this.agentLaunchGuardConstraint = agentLaunchGuardConstraint;
         this.systemSelectorConstraintEvaluator = systemSelectorConstraintEvaluator;
     }
 
     @Activator
     public void enterActiveMode() {
-        this.delegate = new CompositeGlobalConstraintEvaluator(asList(
-                new GlobalInactiveClusterConstraintEvaluator(config, agentManagementService, titusRuntime),
-                new GlobalAgentStateConstraintEvaluator(schedulerConfiguration, agentManagementService),
-                new GlobalAgentClusterConstraint(schedulerConfiguration, agentManagementService, agentStatusMonitor),
-                new GlobalTaskResubmitConstraintEvaluator(),
-                globalTaskLaunchingConstraintEvaluator,
+        this.delegate = new CompositeSystemConstraint(asList(
+                agentManagementConstraint,
+                agentLaunchGuardConstraint,
                 systemSelectorConstraintEvaluator
         ));
-
     }
 
     @Override
     public String getName() {
-        return "DefaultSystemHardConstraint";
+        return NAME;
     }
 
     @Override

@@ -40,6 +40,7 @@ import com.netflix.titus.api.agent.service.AgentStatusMonitor;
 import com.netflix.titus.api.model.ResourceDimension;
 import com.netflix.titus.api.model.Tier;
 import com.netflix.titus.grpc.protogen.AgentChangeEvent;
+import com.netflix.titus.grpc.protogen.HealthState;
 import com.netflix.titus.grpc.protogen.HealthStatus;
 
 public class GrpcAgentModelConverters {
@@ -185,8 +186,10 @@ public class GrpcAgentModelConverters {
                 return InstanceLifecycleState.KillInitiated;
             case Stopped:
                 return InstanceLifecycleState.Stopped;
+            case InstanceStateUnknown:
+            default:
+                return InstanceLifecycleState.Unknown;
         }
-        return InstanceLifecycleState.Stopped;
     }
 
     public static InstanceLifecycleStatus toCoreInstanceLifecycleStatus(com.netflix.titus.grpc.protogen.InstanceLifecycleStatus grpcLifecycleStatus) {
@@ -202,6 +205,8 @@ public class GrpcAgentModelConverters {
                 return InstanceOverrideState.None;
             case Quarantined:
                 return InstanceOverrideState.Quarantined;
+            case AgentRemovable:
+                return InstanceOverrideState.Removable;
         }
         return InstanceOverrideState.None;
     }
@@ -224,7 +229,7 @@ public class GrpcAgentModelConverters {
             case Removable:
                 return com.netflix.titus.grpc.protogen.InstanceGroupLifecycleState.Removable;
         }
-        return com.netflix.titus.grpc.protogen.InstanceGroupLifecycleState.UNRECOGNIZED;
+        throw new IllegalArgumentException("Unrecognized InstanceGroupLifecycleState value: " + state);
     }
 
     public static com.netflix.titus.grpc.protogen.InstanceGroupLifecycleStatus toGrpcLifecycleStatus(InstanceGroupLifecycleStatus instanceGroupLifecycleStatus) {
@@ -245,8 +250,10 @@ public class GrpcAgentModelConverters {
                 return com.netflix.titus.grpc.protogen.InstanceLifecycleState.KillInitiated;
             case Stopped:
                 return com.netflix.titus.grpc.protogen.InstanceLifecycleState.Stopped;
+            case Unknown:
+            default:
+                return com.netflix.titus.grpc.protogen.InstanceLifecycleState.InstanceStateUnknown;
         }
-        return com.netflix.titus.grpc.protogen.InstanceLifecycleState.UNRECOGNIZED;
     }
 
     public static com.netflix.titus.grpc.protogen.InstanceLifecycleStatus toGrpcDeploymentStatus(InstanceLifecycleStatus instanceLifecycleStatus) {
@@ -262,8 +269,10 @@ public class GrpcAgentModelConverters {
                 return com.netflix.titus.grpc.protogen.InstanceOverrideState.NotOverriden;
             case Quarantined:
                 return com.netflix.titus.grpc.protogen.InstanceOverrideState.Quarantined;
+            case Removable:
+                return com.netflix.titus.grpc.protogen.InstanceOverrideState.AgentRemovable;
         }
-        return com.netflix.titus.grpc.protogen.InstanceOverrideState.UNRECOGNIZED;
+        throw new IllegalArgumentException("Unrecognized InstanceOverrideState value: " + state);
     }
 
     public static com.netflix.titus.grpc.protogen.InstanceOverrideStatus toGrpcOverrideStatus(InstanceOverrideStatus instanceOverrideStatus) {
@@ -274,14 +283,15 @@ public class GrpcAgentModelConverters {
                 .build();
     }
 
-    public static com.netflix.titus.grpc.protogen.HealthState toGrpcHealthState(AgentStatus.AgentStatusCode agentStatusCode) {
+    public static HealthState toGrpcHealthState(AgentStatus.AgentStatusCode agentStatusCode) {
         switch (agentStatusCode) {
             case Healthy:
-                return com.netflix.titus.grpc.protogen.HealthState.Healthy;
+                return HealthState.Healthy;
             case Unhealthy:
-                return com.netflix.titus.grpc.protogen.HealthState.Unhealthy;
+                return HealthState.Unhealthy;
+            default:
+                return HealthState.Unknown;
         }
-        return com.netflix.titus.grpc.protogen.HealthState.UNRECOGNIZED;
     }
 
     public static com.netflix.titus.grpc.protogen.HealthStatus toGrpcHealthStatus(AgentStatus agentStatus) {
@@ -318,7 +328,7 @@ public class GrpcAgentModelConverters {
             case Flex:
                 return com.netflix.titus.grpc.protogen.Tier.Flex;
         }
-        return com.netflix.titus.grpc.protogen.Tier.UNRECOGNIZED;
+        throw new IllegalArgumentException("Unrecognized Tier value: " + tier);
     }
 
     public static Optional<AgentChangeEvent> toGrpcEvent(AgentEvent agentEvent, AgentStatusMonitor agentStatusMonitor) {

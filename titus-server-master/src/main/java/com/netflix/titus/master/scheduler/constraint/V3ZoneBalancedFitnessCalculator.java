@@ -11,8 +11,10 @@ import com.netflix.titus.master.scheduler.SchedulerUtils;
 
 public class V3ZoneBalancedFitnessCalculator implements VMTaskFitnessCalculator {
 
-    private final double NOT_MATCHING = 0.01;
-    private final double MATCHING = 1.0;
+    public static final String NAME = "V3ZoneBalancedFitnessCalculator";
+
+    private static final double NOT_MATCHING = 0.01;
+    private static final double MATCHING = 1.0;
 
     private final TaskCache taskCache;
     private final int expectedValues;
@@ -26,7 +28,7 @@ public class V3ZoneBalancedFitnessCalculator implements VMTaskFitnessCalculator 
 
     @Override
     public String getName() {
-        return "V3ZoneBalancedFitnessCalculator";
+        return NAME;
     }
 
     @Override

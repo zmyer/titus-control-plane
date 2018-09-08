@@ -17,7 +17,6 @@
 package com.netflix.titus.testkit.embedded.cell.master;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -34,7 +33,6 @@ import com.google.inject.util.Modules;
 import com.netflix.archaius.ConfigProxyFactory;
 import com.netflix.archaius.config.DefaultSettableConfig;
 import com.netflix.archaius.guice.ArchaiusModule;
-import com.netflix.fenzo.TaskAssignmentResult;
 import com.netflix.governator.InjectorBuilder;
 import com.netflix.governator.LifecycleInjector;
 import com.netflix.governator.guice.jetty.Archaius2JettyModule;
@@ -67,23 +65,21 @@ import com.netflix.titus.grpc.protogen.JobManagementServiceGrpc;
 import com.netflix.titus.grpc.protogen.JobManagementServiceGrpc.JobManagementServiceBlockingStub;
 import com.netflix.titus.grpc.protogen.JobManagementServiceGrpc.JobManagementServiceStub;
 import com.netflix.titus.grpc.protogen.LoadBalancerServiceGrpc;
+import com.netflix.titus.grpc.protogen.SupervisorServiceGrpc;
+import com.netflix.titus.grpc.protogen.SupervisorServiceGrpc.SupervisorServiceBlockingStub;
 import com.netflix.titus.master.TitusMaster;
 import com.netflix.titus.master.TitusMasterModule;
 import com.netflix.titus.master.TitusRuntimeModule;
 import com.netflix.titus.master.VirtualMachineMasterService;
 import com.netflix.titus.master.agent.store.InMemoryAgentStore;
-import com.netflix.titus.master.cluster.LeaderActivator;
-import com.netflix.titus.master.cluster.LeaderElector;
-import com.netflix.titus.master.endpoint.common.SchedulerUtil;
-import com.netflix.titus.master.job.worker.WorkerStateMonitor;
 import com.netflix.titus.master.job.worker.internal.DefaultWorkerStateMonitor;
-import com.netflix.titus.master.master.MasterDescription;
-import com.netflix.titus.master.master.MasterMonitor;
 import com.netflix.titus.master.mesos.MesosSchedulerDriverFactory;
-import com.netflix.titus.master.scheduler.SchedulingService;
 import com.netflix.titus.master.store.V2StorageProvider;
+import com.netflix.titus.master.supervisor.service.LeaderActivator;
+import com.netflix.titus.master.supervisor.service.MasterDescription;
+import com.netflix.titus.master.supervisor.service.MasterMonitor;
+import com.netflix.titus.master.supervisor.service.leader.LocalMasterMonitor;
 import com.netflix.titus.runtime.endpoint.metadata.CallMetadata;
-import com.netflix.titus.runtime.endpoint.metadata.V3HeaderInterceptor;
 import com.netflix.titus.runtime.store.v3.memory.InMemoryJobStore;
 import com.netflix.titus.runtime.store.v3.memory.InMemoryLoadBalancerStore;
 import com.netflix.titus.runtime.store.v3.memory.InMemoryPolicyStore;
@@ -99,12 +95,10 @@ import com.netflix.titus.testkit.embedded.cloud.connector.local.SimulatedLocalMe
 import com.netflix.titus.testkit.embedded.cloud.connector.remote.CloudSimulatorResolver;
 import com.netflix.titus.testkit.embedded.cloud.connector.remote.SimulatedRemoteInstanceCloudConnector;
 import com.netflix.titus.testkit.embedded.cloud.connector.remote.SimulatedRemoteMesosSchedulerDriverFactory;
+import com.netflix.titus.testkit.grpc.GrpcClientErrorUtils;
 import com.netflix.titus.testkit.util.NetworkExt;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import io.grpc.Metadata;
-import io.grpc.stub.AbstractStub;
-import io.grpc.stub.MetadataUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.Observable;
@@ -168,7 +162,7 @@ public class EmbeddedTitusMaster {
         embeddedProperties.put("governator.jetty.embedded.port", apiPort);
         embeddedProperties.put("governator.jetty.embedded.webAppResourceBase", resourceDir);
         embeddedProperties.put("titus.master.cellName", cellName);
-        embeddedProperties.put("titusMaster.v2Enabled", Boolean.toString(builder.v2Enabled));
+        embeddedProperties.put("titusMaster.v2Enabled", "false");
         config.setProperties(embeddedProperties);
 
         if (builder.remoteCloud == null) {
@@ -208,9 +202,8 @@ public class EmbeddedTitusMaster {
                                       bind(InstanceCloudConnector.class).toInstance(cloudInstanceConnector);
                                       bind(MesosSchedulerDriverFactory.class).toInstance(mesosSchedulerDriverFactory);
 
-                                      bind(LeaderElector.class).to(EmbeddedLeaderElector.class);
                                       bind(MasterDescription.class).toInstance(masterDescription);
-                                      bind(MasterMonitor.class).to(EmbeddedMasterMonitor.class);
+                                      bind(MasterMonitor.class).to(LocalMasterMonitor.class);
                                       bind(V2StorageProvider.class).toInstance(storageProvider);
                                       bind(AgentStore.class).toInstance(agentStore);
 
@@ -264,7 +257,7 @@ public class EmbeddedTitusMaster {
         if (enableREST) {
             // Since jetty API server is run on a separate thread, it may not be ready yet
             // We do not have better way, but call it until it replies.
-            getClient().findAllJobs().retryWhen(attempts -> {
+            getClient().findAllApplicationSLA().retryWhen(attempts -> {
                         return attempts.zipWith(Observable.range(1, 5), (n, i) -> i).flatMap(i -> {
                             return Observable.timer(i, TimeUnit.SECONDS);
                         });
@@ -314,37 +307,42 @@ public class EmbeddedTitusMaster {
 
     public HealthStub getHealthClient() {
         HealthStub client = HealthGrpc.newStub(getOrCreateGrpcChannel());
-        return attachCallHeaders(client);
+        return GrpcClientErrorUtils.attachCallHeaders(client);
+    }
+
+    public SupervisorServiceBlockingStub getSupervisorBlockingGrpcClient() {
+        SupervisorServiceBlockingStub client = SupervisorServiceGrpc.newBlockingStub(getOrCreateGrpcChannel());
+        return GrpcClientErrorUtils.attachCallHeaders(client);
     }
 
     public JobManagementServiceStub getV3GrpcClient() {
         JobManagementServiceStub client = JobManagementServiceGrpc.newStub(getOrCreateGrpcChannel());
-        return attachCallHeaders(client);
+        return GrpcClientErrorUtils.attachCallHeaders(client);
     }
 
     public JobManagementServiceBlockingStub getV3BlockingGrpcClient() {
         JobManagementServiceBlockingStub client = JobManagementServiceGrpc.newBlockingStub(getOrCreateGrpcChannel());
-        return attachCallHeaders(client);
+        return GrpcClientErrorUtils.attachCallHeaders(client);
     }
 
     public AgentManagementServiceGrpc.AgentManagementServiceStub getV3GrpcAgentClient() {
         AgentManagementServiceGrpc.AgentManagementServiceStub client = AgentManagementServiceGrpc.newStub(getOrCreateGrpcChannel());
-        return attachCallHeaders(client);
+        return GrpcClientErrorUtils.attachCallHeaders(client);
     }
 
     public AgentManagementServiceGrpc.AgentManagementServiceBlockingStub getV3BlockingGrpcAgentClient() {
         AgentManagementServiceGrpc.AgentManagementServiceBlockingStub client = AgentManagementServiceGrpc.newBlockingStub(getOrCreateGrpcChannel());
-        return attachCallHeaders(client);
+        return GrpcClientErrorUtils.attachCallHeaders(client);
     }
 
     public AutoScalingServiceGrpc.AutoScalingServiceStub getAutoScaleGrpcClient() {
         AutoScalingServiceGrpc.AutoScalingServiceStub client = AutoScalingServiceGrpc.newStub(getOrCreateGrpcChannel());
-        return attachCallHeaders(client);
+        return GrpcClientErrorUtils.attachCallHeaders(client);
     }
 
     public LoadBalancerServiceGrpc.LoadBalancerServiceStub getLoadBalancerGrpcClient() {
         LoadBalancerServiceGrpc.LoadBalancerServiceStub client = LoadBalancerServiceGrpc.newStub(getOrCreateGrpcChannel());
-        return attachCallHeaders(client);
+        return GrpcClientErrorUtils.attachCallHeaders(client);
     }
 
     private ManagedChannel getOrCreateGrpcChannel() {
@@ -381,24 +379,22 @@ public class EmbeddedTitusMaster {
         return injector.getInstance(type);
     }
 
-    public List<TaskAssignmentResult> reportForTask(String taskId) {
-        return SchedulerUtil.blockAndGetTaskAssignmentFailures(injector.getInstance(SchedulingService.class), taskId);
-    }
-
-    public WorkerStateMonitor getWorkerStateMonitor() {
-        return workerStateMonitor;
-    }
-
     public static Builder aTitusMaster() {
         return new Builder();
     }
 
     public Observable<TaskExecutorHolder> awaitTaskExecutorHolderOf(String taskId) {
-        return observeLaunchedTasks().compose(ObservableExt.head(() -> simulatedCloud.getAgentInstanceGroups().stream()
-                .flatMap(c -> c.getAgents().stream())
-                .flatMap(a -> a.findTaskById(taskId).map(Collections::singletonList).orElse(Collections.emptyList()).stream())
-                .limit(1)
-                .collect(Collectors.toList())));
+        return observeLaunchedTasks()
+                .compose(ObservableExt.head(() ->
+                        simulatedCloud.getAgentInstanceGroups().stream()
+                                .flatMap(c -> c.getAgents().stream())
+                                .flatMap(a -> a.getAllTasks().stream())
+                                .filter(th -> th.getTaskId().equals(taskId))
+                                .limit(1)
+                                .collect(Collectors.toList())
+                ))
+                .filter(th -> th.getTaskId().equals(taskId))
+                .limit(1);
     }
 
     public String getCellName() {
@@ -411,14 +407,6 @@ public class EmbeddedTitusMaster {
 
     public int getGrpcPort() {
         return grpcPort;
-    }
-
-    private <STUB extends AbstractStub<STUB>> STUB attachCallHeaders(STUB client) {
-        Metadata metadata = new Metadata();
-        metadata.put(V3HeaderInterceptor.CALLER_ID_KEY, "embeddedMasterClient");
-        metadata.put(V3HeaderInterceptor.CALL_REASON_KEY, "test call");
-        metadata.put(V3HeaderInterceptor.DEBUG_KEY, "true");
-        return client.withInterceptors(MetadataUtils.newAttachHeadersInterceptor(metadata));
     }
 
     public Builder toBuilder() {
@@ -455,17 +443,9 @@ public class EmbeddedTitusMaster {
         private SimulatedCloud simulatedCloud;
         private Pair<String, Integer> remoteCloud;
 
-        // Enable V2 engine by default
-        private boolean v2Enabled = true;
-
         public Builder() {
             props.put("titusMaster.job.configuration.defaultSecurityGroups", "sg-12345,sg-34567");
             props.put("titusMaster.job.configuration.defaultIamRole", "iam-12345");
-        }
-
-        public Builder withV2Engine(boolean v2Enabled) {
-            this.v2Enabled = v2Enabled;
-            return this;
         }
 
         public Builder withCellName(String cellName) {

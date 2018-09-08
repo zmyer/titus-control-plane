@@ -88,6 +88,14 @@ public interface SchedulerConfiguration {
     boolean isExitUponFenzoSchedulingErrorEnabled();
 
     /**
+     * An option to enable fenzo autoscaling of agents.
+     *
+     * @return whether or not fenzo should autoscale agents.
+     */
+    @DefaultValue("false")
+    boolean isFenzoAutoScalingEnabled();
+
+    /**
      * An option to enable fenzo downscaling of agents.
      *
      * @return whether or not fenzo should downscale agents.
@@ -129,4 +137,10 @@ public interface SchedulerConfiguration {
      */
     @DefaultValue("300000")
     long getPreferredNetworkInterfaceDelayMs();
+
+    /**
+     * Amount of time to keep information about task execution failures on an agent.
+     */
+    @DefaultValue("300000")
+    long getContainerFailureTrackingRetentionMs();
 }

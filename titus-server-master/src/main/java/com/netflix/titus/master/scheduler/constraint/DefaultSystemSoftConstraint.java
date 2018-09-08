@@ -25,28 +25,28 @@ import com.netflix.fenzo.TaskTrackerState;
 import com.netflix.fenzo.VirtualMachineCurrentState;
 import com.netflix.fenzo.plugins.WeightedAverageFitnessCalculator;
 import com.netflix.fenzo.plugins.WeightedAverageFitnessCalculator.WeightedFitnessCalculator;
-import com.netflix.titus.master.scheduler.fitness.AgentManagementFitnessCalculator;
 import com.netflix.titus.master.scheduler.systemselector.SystemSelectorFitnessCalculator;
 
 import static java.util.Arrays.asList;
 
 @Singleton
 public class DefaultSystemSoftConstraint implements SystemSoftConstraint {
+
+    public static final String NAME = "DefaultSystemSoftConstraint";
+
     private final WeightedAverageFitnessCalculator delegate;
 
     @Inject
-    public DefaultSystemSoftConstraint(AgentManagementFitnessCalculator agentManagementFitnessCalculator,
-                                       SystemSelectorFitnessCalculator systemSelectorFitnessCalculator) {
+    public DefaultSystemSoftConstraint(SystemSelectorFitnessCalculator systemSelectorFitnessCalculator) {
         List<WeightedFitnessCalculator> calculators = asList(
-                new WeightedFitnessCalculator(agentManagementFitnessCalculator, 0.6),
-                new WeightedFitnessCalculator(systemSelectorFitnessCalculator, 0.4)
+                new WeightedFitnessCalculator(systemSelectorFitnessCalculator, 1.0)
         );
         delegate = new WeightedAverageFitnessCalculator(calculators);
     }
 
     @Override
     public String getName() {
-        return "Default System Soft Constraint";
+        return NAME;
     }
 
     @Override

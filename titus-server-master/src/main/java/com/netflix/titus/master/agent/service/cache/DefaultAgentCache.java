@@ -148,25 +148,27 @@ public class DefaultAgentCache implements AgentCache {
 
         logger.info("Started AgentCache with: {}", dataSnapshot.getInstanceGroups());
 
-        this.instanceCacheSubscription = instanceCache.events().subscribe(
-                event -> {
-                    switch (event.getType()) {
-                        case Refreshed:
-                            onEventLoop(this::updateOnFullRefreshInstanceCacheEvent);
-                            break;
-                        case InstanceGroup:
-                            onEventLoop(() -> updateOnInstanceGroupInstanceCacheEvent(event.getResourceId()));
-                            break;
-                        case Instance:
-                            // Ignore, as instance group, and its instances are refreshed at the same time
-                            break;
-                    }
-                },
-                e -> logger.error("InstanceCache events stream completed with an error", e),
-                () -> logger.info("InstanceCache events stream completed")
-        );
-
-        updateOnFullRefreshInstanceCacheEvent();
+        this.instanceCacheSubscription = instanceCache.events()
+                .compose(ObservableExt.head(() ->
+                        Collections.singletonList(new CacheUpdateEvent(CacheUpdateType.Refreshed, CacheUpdateEvent.EMPTY_ID)))
+                )
+                .subscribe(
+                        event -> {
+                            switch (event.getType()) {
+                                case Refreshed:
+                                    onEventLoop(this::updateOnFullRefreshInstanceCacheEvent);
+                                    break;
+                                case InstanceGroup:
+                                    onEventLoop(() -> updateOnInstanceGroupInstanceCacheEvent(event.getResourceId()));
+                                    break;
+                                case Instance:
+                                    // Ignore, as instance group, and its instances are refreshed at the same time
+                                    break;
+                            }
+                        },
+                        e -> logger.error("InstanceCache events stream completed with an error", e),
+                        () -> logger.info("InstanceCache events stream completed")
+                );
     }
 
     public void shutdown() {
@@ -184,6 +186,11 @@ public class DefaultAgentCache implements AgentCache {
     @Override
     public AgentInstanceGroup getInstanceGroup(String instanceGroupId) {
         return AgentManagementException.checkInstanceGroupFound(dataSnapshot.getInstanceGroup(instanceGroupId), instanceGroupId);
+    }
+
+    @Override
+    public Optional<AgentInstanceGroup> findInstanceGroup(String instanceGroupId) {
+        return Optional.ofNullable(dataSnapshot.getInstanceGroup(instanceGroupId));
     }
 
     @Override

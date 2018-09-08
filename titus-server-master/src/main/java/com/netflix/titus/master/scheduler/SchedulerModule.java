@@ -27,7 +27,6 @@ import com.netflix.archaius.ConfigProxyFactory;
 import com.netflix.fenzo.PreferentialNamedConsumableResourceEvaluator;
 import com.netflix.fenzo.ScaleDownConstraintEvaluator;
 import com.netflix.fenzo.ScaleDownOrderEvaluator;
-import com.netflix.titus.api.model.v2.JobConstraints;
 import com.netflix.titus.api.scheduler.service.SchedulerService;
 import com.netflix.titus.common.util.tuple.Pair;
 import com.netflix.titus.grpc.protogen.SchedulerServiceGrpc;
@@ -36,7 +35,6 @@ import com.netflix.titus.master.scheduler.constraint.DefaultSystemHardConstraint
 import com.netflix.titus.master.scheduler.constraint.DefaultSystemSoftConstraint;
 import com.netflix.titus.master.scheduler.constraint.SystemHardConstraint;
 import com.netflix.titus.master.scheduler.constraint.SystemSoftConstraint;
-import com.netflix.titus.master.scheduler.constraint.V2ConstraintEvaluatorTransformer;
 import com.netflix.titus.master.scheduler.constraint.V3ConstraintEvaluatorTransformer;
 import com.netflix.titus.master.scheduler.endpoint.grpc.DefaultSchedulerServiceGrpc;
 import com.netflix.titus.master.scheduler.fitness.networkinterface.TitusNetworkInterfaceFitnessEvaluator;
@@ -44,16 +42,12 @@ import com.netflix.titus.master.scheduler.resourcecache.AgentResourceCache;
 import com.netflix.titus.master.scheduler.resourcecache.DefaultAgentResourceCache;
 import com.netflix.titus.master.scheduler.scaling.AutoScaleController;
 import com.netflix.titus.master.scheduler.scaling.DefaultAutoScaleController;
-import com.netflix.titus.master.scheduler.scaling.TitusInactiveClusterScaleDownConstraintEvaluator;
+import com.netflix.titus.master.scheduler.scaling.TitusActiveClusterScaleDownConstraintEvaluator;
 import com.netflix.titus.master.scheduler.scaling.ZoneBalancedClusterScaleDownConstraintEvaluator;
 import com.netflix.titus.master.scheduler.service.DefaultSchedulerService;
 
 
 public final class SchedulerModule extends AbstractModule {
-
-    private static final TypeLiteral<ConstraintEvaluatorTransformer<JobConstraints>> V2_CONSTRAINT_EVALUATOR_TRANSFORMER_TYPE =
-            new TypeLiteral<ConstraintEvaluatorTransformer<JobConstraints>>() {
-            };
 
     private static final TypeLiteral<ConstraintEvaluatorTransformer<Pair<String, String>>> V3_CONSTRAINT_EVALUATOR_TRANSFORMER_TYPE =
             new TypeLiteral<ConstraintEvaluatorTransformer<Pair<String, String>>>() {
@@ -63,7 +57,7 @@ public final class SchedulerModule extends AbstractModule {
     protected void configure() {
         bind(VMOperations.class).to(VMOperationsImpl.class);
         bind(TierSlaUpdater.class).to(DefaultTierSlaUpdater.class);
-        bind(ScaleDownOrderEvaluator.class).to(TitusInactiveClusterScaleDownConstraintEvaluator.class);
+        bind(ScaleDownOrderEvaluator.class).to(TitusActiveClusterScaleDownConstraintEvaluator.class);
         bind(PreferentialNamedConsumableResourceEvaluator.class).to(TitusNetworkInterfaceFitnessEvaluator.class);
         bind(AutoScaleController.class).to(DefaultAutoScaleController.class);
         bind(SchedulingService.class).to(DefaultSchedulingService.class).asEagerSingleton();
@@ -72,7 +66,7 @@ public final class SchedulerModule extends AbstractModule {
         bind(SystemSoftConstraint.class).to(DefaultSystemSoftConstraint.class);
         bind(SystemHardConstraint.class).to(DefaultSystemHardConstraint.class);
 
-        bind(V2_CONSTRAINT_EVALUATOR_TRANSFORMER_TYPE).to(V2ConstraintEvaluatorTransformer.class);
+        bind(AgentQualityTracker.class).to(ContainerFailureBasedAgentQualityTracker.class);
         bind(V3_CONSTRAINT_EVALUATOR_TRANSFORMER_TYPE).to(V3ConstraintEvaluatorTransformer.class);
 
         bind(SchedulerServiceGrpc.SchedulerServiceImplBase.class).to(DefaultSchedulerServiceGrpc.class);

@@ -9,21 +9,18 @@ import com.netflix.titus.master.jobmanager.service.common.V3QueueableTask;
 
 public class V3UniqueHostConstraint implements ConstraintEvaluator {
 
+    public static final String NAME = "UniqueAgentConstraint";
+
     private static final Result VALID = new Result(true, null);
     private static final Result INVALID = new Result(false, "Task from the same job already running on the agent");
 
     @Override
     public String getName() {
-        return "UniqueAgentConstraint";
+        return NAME;
     }
 
     @Override
     public Result evaluate(TaskRequest taskRequest, VirtualMachineCurrentState targetVM, TaskTrackerState taskTrackerState) {
-        // Ignore the constraint for non-V3 tasks.
-        if (!(taskRequest instanceof V3QueueableTask)) {
-            return VALID;
-        }
-
         V3QueueableTask v3FenzoTask = (V3QueueableTask) taskRequest;
         String jobId = v3FenzoTask.getJob().getId();
 
@@ -43,12 +40,7 @@ public class V3UniqueHostConstraint implements ConstraintEvaluator {
     }
 
     private boolean check(String jobId, TaskRequest running) {
-        if (running instanceof V3QueueableTask) {
-            V3QueueableTask v3FenzoRunningTask = (V3QueueableTask) running;
-            if (v3FenzoRunningTask.getJob().getId().equals(jobId)) {
-                return true;
-            }
-        }
-        return false;
+        V3QueueableTask v3FenzoRunningTask = (V3QueueableTask) running;
+        return v3FenzoRunningTask.getJob().getId().equals(jobId);
     }
 }

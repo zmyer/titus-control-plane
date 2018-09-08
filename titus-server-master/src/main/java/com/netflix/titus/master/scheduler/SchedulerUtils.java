@@ -27,10 +27,20 @@ import com.netflix.fenzo.TaskTracker;
 import com.netflix.fenzo.VirtualMachineCurrentState;
 import com.netflix.fenzo.VirtualMachineLease;
 import com.netflix.fenzo.queues.QueuableTask;
+import com.netflix.titus.api.model.Tier;
+import com.netflix.titus.common.util.StringExt;
 import com.netflix.titus.master.jobmanager.service.common.V3QueueableTask;
 import org.apache.mesos.Protos;
 
 public class SchedulerUtils {
+
+    public static Tier getTier(QueuableTask queuableTask) {
+        Tier tier = Tier.Flex;
+        if (queuableTask.getQAttributes().getTierNumber() == 0) {
+            tier = Tier.Critical;
+        }
+        return tier;
+    }
 
     public static boolean hasGpuRequest(QueuableTask task) {
         return task != null && task.getScalarRequests() != null &&
@@ -38,20 +48,24 @@ public class SchedulerUtils {
                 task.getScalarRequests().get("gpu") >= 1.0;
     }
 
-    public static String getAttributeValueOrEmptyString(Map<String, Protos.Attribute> attributeMap, String attributeName) {
+    public static String getAttributeValueOrDefault(Map<String, Protos.Attribute> attributeMap, String attributeName, String defaultValue) {
         if (attributeMap == null) {
-            return "";
+            return defaultValue;
         }
+        Protos.Attribute attr = attributeMap.get(attributeName);
+        if (attr == null || attr.getText() == null) {
+            return defaultValue;
+        }
+        String attrValue = StringExt.safeTrim(attr.getText().getValue());
+        return attrValue.isEmpty() ? defaultValue : attrValue;
+    }
 
-        Protos.Attribute attributeValue = attributeMap.get(attributeName);
-        if (attributeValue == null) {
-            return "";
-        }
+    public static String getAttributeValueOrDefault(VirtualMachineLease lease, String attributeName, String defaultValue) {
+        return getAttributeValueOrDefault(lease.getAttributeMap(), attributeName, defaultValue);
+    }
 
-        if (!attributeValue.hasText()) {
-            return "";
-        }
-        return Strings.nullToEmpty(attributeValue.getText().getValue());
+    public static String getAttributeValueOrEmptyString(Map<String, Protos.Attribute> attributeMap, String attributeName) {
+        return getAttributeValueOrDefault(attributeMap, attributeName, "");
     }
 
     public static String getAttributeValueOrEmptyString(VirtualMachineCurrentState targetVM, String attributeName) {

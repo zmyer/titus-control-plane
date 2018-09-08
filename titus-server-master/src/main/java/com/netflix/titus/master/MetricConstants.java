@@ -23,6 +23,8 @@ public class MetricConstants {
 
     public static final String METRIC_ROOT = "titusMaster.";
 
+    public static final String METRIC_SUPERVISOR = METRIC_ROOT + "supervisor.";
+
     public static final String METRIC_AGENT = METRIC_ROOT + "agent.";
 
     public static final String METRIC_AGENT_CACHE = METRIC_ROOT + "agentCache.";
@@ -30,6 +32,8 @@ public class MetricConstants {
     public static final String METRIC_AGENT_MONITOR = METRIC_ROOT + "agentMonitor.";
 
     public static final String METRIC_CAPACITY_MANAGEMENT = METRIC_ROOT + "capacity.";
+
+    public static final String METRIC_CLUSTER_OPERATIONS = METRIC_ROOT + "clusterOperations.";
 
     public static final String METRIC_SCHEDULING_SERVICE = METRIC_ROOT + "scheduler.";
 
@@ -46,4 +50,6 @@ public class MetricConstants {
     public static final String METRIC_WORKER_STATE_OBSERVER = METRIC_ROOT + "workerStateObserver.";
 
     public static final String METRIC_LOADBALANCER = METRIC_ROOT + "loadBalancer.";
+
+    public static final String METRIC_ES_PUBLISHER = METRIC_ROOT + "esPublisher.";
 }
