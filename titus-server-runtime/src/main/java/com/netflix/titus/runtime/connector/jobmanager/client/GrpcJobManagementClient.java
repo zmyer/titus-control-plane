@@ -1,3 +1,19 @@
+/*
+ * Copyright 2018 Netflix, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.netflix.titus.runtime.connector.jobmanager.client;
 
 import java.util.Set;
@@ -5,12 +21,12 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.validation.ConstraintViolation;
 
 import com.google.protobuf.Empty;
 import com.netflix.titus.api.jobmanager.model.job.Capacity;
 import com.netflix.titus.api.service.TitusServiceException;
 import com.netflix.titus.common.model.sanitizer.EntitySanitizer;
+import com.netflix.titus.common.model.validator.ValidationError;
 import com.netflix.titus.grpc.protogen.Job;
 import com.netflix.titus.grpc.protogen.JobCapacityUpdate;
 import com.netflix.titus.grpc.protogen.JobChangeNotification;
@@ -21,6 +37,7 @@ import com.netflix.titus.grpc.protogen.JobProcessesUpdate;
 import com.netflix.titus.grpc.protogen.JobQuery;
 import com.netflix.titus.grpc.protogen.JobQueryResult;
 import com.netflix.titus.grpc.protogen.JobStatusUpdate;
+import com.netflix.titus.grpc.protogen.ObserveJobsQuery;
 import com.netflix.titus.grpc.protogen.TaskId;
 import com.netflix.titus.grpc.protogen.TaskKillRequest;
 import com.netflix.titus.grpc.protogen.TaskQuery;
@@ -72,7 +89,7 @@ public class GrpcJobManagementClient implements JobManagementClient {
         }
         com.netflix.titus.api.jobmanager.model.job.JobDescriptor sanitizedCoreJobDescriptor = entitySanitizer.sanitize(coreJobDescriptor).orElse(coreJobDescriptor);
 
-        Set<ConstraintViolation<com.netflix.titus.api.jobmanager.model.job.JobDescriptor>> violations = entitySanitizer.validate(sanitizedCoreJobDescriptor);
+        Set<ValidationError> violations = entitySanitizer.validate(sanitizedCoreJobDescriptor);
         if (!violations.isEmpty()) {
             return Observable.error(TitusServiceException.invalidArgument(violations));
         }
@@ -93,7 +110,7 @@ public class GrpcJobManagementClient implements JobManagementClient {
     @Override
     public Completable updateJobCapacity(JobCapacityUpdate jobCapacityUpdate) {
         Capacity newCapacity = V3GrpcModelConverters.toCoreCapacity(jobCapacityUpdate.getCapacity());
-        Set<ConstraintViolation<Capacity>> violations = entitySanitizer.validate(newCapacity);
+        Set<ValidationError> violations = entitySanitizer.validate(newCapacity);
         if (!violations.isEmpty()) {
             return Completable.error(TitusServiceException.invalidArgument(violations));
         }
@@ -145,10 +162,10 @@ public class GrpcJobManagementClient implements JobManagementClient {
     }
 
     @Override
-    public Observable<JobChangeNotification> observeJobs() {
+    public Observable<JobChangeNotification> observeJobs(ObserveJobsQuery query) {
         return createRequestObservable(emitter -> {
             StreamObserver<JobChangeNotification> streamObserver = createSimpleClientResponseObserver(emitter);
-            createWrappedStub(client, callMetadataResolver).observeJobs(Empty.getDefaultInstance(), streamObserver);
+            createWrappedStub(client, callMetadataResolver).observeJobs(query, streamObserver);
         });
     }
 

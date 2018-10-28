@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import com.google.protobuf.Any;
 import com.google.rpc.BadRequest;
 import com.google.rpc.DebugInfo;
+import com.netflix.titus.api.agent.service.AgentManagementException;
 import com.netflix.titus.api.jobmanager.service.JobManagerException;
 import com.netflix.titus.api.scheduler.service.SchedulerException;
 import com.netflix.titus.api.service.TitusServiceException;
@@ -94,13 +95,13 @@ public final class ErrorResponses {
 
         if (exception instanceof TitusServiceException) {
             TitusServiceException e = (TitusServiceException) exception;
-            if (!e.getConstraintViolations().isEmpty()) {
+            if (!e.getValidationErrors().isEmpty()) {
                 BadRequest.Builder rbuilder = BadRequest.newBuilder();
 
-                e.getConstraintViolations().forEach(v -> {
+                e.getValidationErrors().forEach(v -> {
                     BadRequest.FieldViolation.Builder fbuilder = BadRequest.FieldViolation.newBuilder();
-                    fbuilder.setField(v.getPropertyPath().toString());
-                    fbuilder.setDescription(v.getMessage());
+                    fbuilder.setField(v.getField());
+                    fbuilder.setDescription(v.getDescription());
 
                     rbuilder.addFieldViolations(fbuilder.build());
                 });
@@ -139,6 +140,20 @@ public final class ErrorResponses {
                 case UNIMPLEMENTED:
                     return Status.UNIMPLEMENTED;
                 case UNEXPECTED:
+                    return Status.INTERNAL;
+            }
+        } else if (cause instanceof AgentManagementException) {
+            AgentManagementException e = (AgentManagementException) cause;
+            switch (e.getErrorCode()) {
+                case InitializationError:
+                    return Status.INTERNAL;
+                case InvalidArgument:
+                    return Status.INVALID_ARGUMENT;
+                case InstanceGroupNotFound:
+                case AgentNotFound:
+                case InstanceTypeNotFound:
+                    return Status.NOT_FOUND;
+                default:
                     return Status.INTERNAL;
             }
         } else if (cause instanceof JobManagerException) {

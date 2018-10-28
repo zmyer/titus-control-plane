@@ -1,6 +1,22 @@
+/*
+ * Copyright 2018 Netflix, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.netflix.titus.runtime.connector.agent.replicator;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 import com.netflix.titus.api.agent.model.AgentInstance;
 import com.netflix.titus.api.agent.model.InstanceLifecycleState;
@@ -12,15 +28,15 @@ import com.netflix.titus.common.runtime.TitusRuntimes;
 import com.netflix.titus.runtime.connector.agent.AgentManagementClient;
 import com.netflix.titus.runtime.connector.agent.AgentSnapshot;
 import com.netflix.titus.runtime.connector.common.replicator.DataReplicatorMetrics;
-import com.netflix.titus.runtime.connector.common.replicator.ReplicatorEventStream;
+import com.netflix.titus.runtime.connector.common.replicator.ReplicatorEventStream.ReplicatorEvent;
 import com.netflix.titus.runtime.connector.jobmanager.replicator.GrpcJobReplicatorEventStream;
-import com.netflix.titus.testkit.model.agent.AgentDeployment;
-import com.netflix.titus.testkit.rx.ExtTestSubscriber;
-import org.junit.Before;
+import com.netflix.titus.testkit.model.agent.AgentComponentStub;
 import org.junit.Test;
-import rx.schedulers.Schedulers;
-import rx.schedulers.TestScheduler;
+import reactor.core.scheduler.Schedulers;
+import reactor.test.StepVerifier;
 
+import static com.netflix.titus.testkit.model.agent.AgentComponentStub.newAgentComponent;
+import static com.netflix.titus.testkit.model.agent.AgentGenerator.agentServerGroup;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -30,85 +46,96 @@ public class GrpcAgentReplicatorEventStreamTest {
     private static final int FLEX_1_DESIRED = 5;
     private static final int CRITICAL_1_DESIRED = 10;
 
-    private final TestScheduler testScheduler = Schedulers.test();
+    private final TitusRuntime titusRuntime = TitusRuntimes.test();
 
-    private final TitusRuntime titusRuntime = TitusRuntimes.test(testScheduler);
-
-    private final AgentDeployment deployment = AgentDeployment.newDeployment()
-            .withActiveInstanceGroup(Tier.Flex, "flex-1", AwsInstanceType.R4_4XLarge, FLEX_1_DESIRED)
-            .withActiveInstanceGroup(Tier.Critical, "critical-1", AwsInstanceType.M4_4XLarge, CRITICAL_1_DESIRED)
-            .build();
+    private final AgentComponentStub agentComponentStub = newAgentComponent()
+            .addInstanceGroup(agentServerGroup("flex-1", Tier.Flex, FLEX_1_DESIRED, AwsInstanceType.R4_4XLarge))
+            .addInstanceGroup(agentServerGroup("critical-1", Tier.Critical, CRITICAL_1_DESIRED, AwsInstanceType.M4_4XLarge));
 
     private final AgentManagementClient client = mock(AgentManagementClient.class);
 
-    private final GrpcAgentReplicatorEventStream agentStreamCache = new GrpcAgentReplicatorEventStream(client, new DataReplicatorMetrics("test", titusRuntime), titusRuntime, testScheduler);
-
-    private final ExtTestSubscriber<ReplicatorEventStream.ReplicatorEvent<AgentSnapshot>> cacheEventSubscriber = new ExtTestSubscriber<>();
-
-    @Before
-    public void setUp() {
-        when(client.observeAgents()).thenReturn(deployment.grpcObserveAgents(true));
-    }
-
     @Test
     public void testCacheBootstrap() {
-        agentStreamCache.connect().subscribe(cacheEventSubscriber);
+        newConnectVerifier().
+                assertNext(initialReplicatorEvent -> {
+                    assertThat(initialReplicatorEvent).isNotNull();
+                    assertThat(initialReplicatorEvent.getData().getInstanceGroups()).hasSize(2);
+                    assertThat(initialReplicatorEvent.getData().getInstances()).hasSize(FLEX_1_DESIRED + CRITICAL_1_DESIRED);
+                })
 
-        ReplicatorEventStream.ReplicatorEvent<AgentSnapshot> initialReplicatorEvent = cacheEventSubscriber.takeNext();
-        assertThat(initialReplicatorEvent).isNotNull();
-        assertThat(initialReplicatorEvent.getData().getInstanceGroups()).hasSize(2);
-        assertThat(initialReplicatorEvent.getData().getInstances()).hasSize(FLEX_1_DESIRED + CRITICAL_1_DESIRED);
+                .thenCancel()
+                .verify();
     }
 
     @Test
     public void testCacheInstanceGroupUpdate() {
-        bootstrap();
-        deployment.changeTier("flex-1", Tier.Critical);
-        assertThat(cacheEventSubscriber.takeNext().getData().findInstanceGroup("flex-1").get().getTier()).isEqualTo(Tier.Critical);
+        newConnectVerifier()
+                .assertNext(next -> assertThat(next.getData().findInstanceGroup("flex-1").get().getTier()).isEqualTo(Tier.Flex))
+                .then(() -> agentComponentStub.changeTier("flex-1", Tier.Critical))
+                .assertNext(next -> assertThat(next.getData().findInstanceGroup("flex-1").get().getTier()).isEqualTo(Tier.Critical))
+
+                .thenCancel()
+                .verify();
     }
 
     @Test
     public void testCacheInstanceGroupRemove() {
-        bootstrap();
+        newConnectVerifier()
+                .then(() -> agentComponentStub.removeInstanceGroup("flex-1"))
+                .expectNextCount(FLEX_1_DESIRED - 1)
+                .assertNext(next -> assertThat(next.getData().getInstances("flex-1")).hasSize(1))
+                .assertNext(next -> assertThat(next.getData().getInstances("flex-1")).isEmpty())
 
-        deployment.removeInstanceGroup("flex-1");
-        for (int i = 0; i < FLEX_1_DESIRED; i++) {
-            assertThat(cacheEventSubscriber.takeNext().getData().getInstances("flex-1")).hasSize(FLEX_1_DESIRED - i - 1);
-        }
-        assertThat(cacheEventSubscriber.takeNext().getData().findInstanceGroup("flex-1")).isNotPresent();
+                .thenCancel()
+                .verify();
     }
 
     @Test
     public void testCacheInstanceUpdate() {
-        bootstrap();
-
-        AgentInstance instance = deployment.getFirstInstance();
+        AgentInstance instance = agentComponentStub.getFirstInstance();
         InstanceLifecycleStatus newStatus = InstanceLifecycleStatus.newBuilder()
                 .withState(InstanceLifecycleState.Stopped)
                 .build();
 
-        deployment.changeInstanceLifecycleStatus(instance.getId(), newStatus);
-        assertThat(cacheEventSubscriber.takeNext().getData().findInstance(instance.getId()).get().getLifecycleStatus()).isEqualTo(newStatus);
+        newConnectVerifier()
+                .assertNext(next -> assertThat(next.getData().findInstance(instance.getId()).get().getLifecycleStatus()).isEqualTo(instance.getLifecycleStatus()))
+                .then(() -> agentComponentStub.changeInstanceLifecycleStatus(instance.getId(), newStatus))
+                .assertNext(next -> assertThat(next.getData().findInstance(instance.getId()).get().getLifecycleStatus()).isEqualTo(newStatus))
+
+                .thenCancel()
+                .verify();
     }
 
     @Test
     public void testCacheInstanceRemove() {
-        bootstrap();
-        AgentInstance instance = deployment.getFirstInstance();
-        deployment.removeInstance(instance.getId());
-        assertThat(cacheEventSubscriber.takeNext().getData().findInstance(instance.getId())).isNotPresent();
+        AgentInstance instance = agentComponentStub.getFirstInstance();
+
+        newConnectVerifier()
+                .assertNext(next -> assertThat(next.getData().findInstance(instance.getId())).isPresent())
+                .then(() -> agentComponentStub.terminateInstance(instance.getId(), true))
+                .assertNext(next -> assertThat(next.getData().findInstance(instance.getId())).isNotPresent())
+
+                .thenCancel()
+                .verify();
     }
 
     @Test
-    public void testReemit() {
-        bootstrap();
-        assertThat(cacheEventSubscriber.takeNext()).isNull();
-        testScheduler.advanceTimeBy(GrpcJobReplicatorEventStream.LATENCY_REPORT_INTERVAL_MS, TimeUnit.MILLISECONDS);
-        assertThat(cacheEventSubscriber.takeNext()).isNotNull();
+    public void testReEmit() {
+        newConnectVerifier()
+                .expectNextCount(1)
+                .expectNoEvent(Duration.ofMillis(GrpcJobReplicatorEventStream.LATENCY_REPORT_INTERVAL_MS))
+                .expectNextCount(1)
+
+                .thenCancel()
+                .verify();
     }
 
-    private void bootstrap() {
-        agentStreamCache.connect().subscribe(cacheEventSubscriber);
-        cacheEventSubscriber.skipAvailable();
+    private GrpcAgentReplicatorEventStream newStream() {
+        when(client.observeAgents()).thenReturn(agentComponentStub.grpcObserveAgents(true));
+        return new GrpcAgentReplicatorEventStream(client, new DataReplicatorMetrics("test", titusRuntime), titusRuntime, Schedulers.parallel());
+    }
+
+    private StepVerifier.FirstStep<ReplicatorEvent<AgentSnapshot>> newConnectVerifier() {
+        return StepVerifier.withVirtualTime(() -> newStream().connect().log());
     }
 }

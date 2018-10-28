@@ -18,6 +18,9 @@ package com.netflix.titus.testkit.embedded.cell;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
+import com.netflix.titus.api.jobmanager.model.job.JobDescriptor;
+import com.netflix.titus.api.jobmanager.model.job.validator.PassJobValidator;
+import com.netflix.titus.common.model.validator.EntityValidator;
 import com.netflix.titus.testkit.embedded.EmbeddedTitusOperations;
 import com.netflix.titus.testkit.embedded.cell.gateway.EmbeddedTitusGateway;
 import com.netflix.titus.testkit.embedded.cell.master.EmbeddedTitusMaster;
@@ -39,7 +42,8 @@ public class EmbeddedTitusCell {
     }
 
     public EmbeddedTitusCell toMaster(Function<EmbeddedTitusMaster.Builder, EmbeddedTitusMaster.Builder> masterTransformer) {
-        return new EmbeddedTitusCell(masterTransformer.apply(master.toBuilder()).build(), gateway);
+        EmbeddedTitusMaster newMaster = masterTransformer.apply(master.toBuilder()).build();
+        return new EmbeddedTitusCell(newMaster, gateway.toBuilder().withMaster(newMaster).build());
     }
 
     public EmbeddedTitusCell boot() {
@@ -76,6 +80,7 @@ public class EmbeddedTitusCell {
         private EmbeddedTitusGateway gateway;
         private boolean enableREST;
         private boolean defaultGateway;
+        private EntityValidator<JobDescriptor> validator = new PassJobValidator();
 
         public Builder withMaster(EmbeddedTitusMaster master) {
             this.master = master;
@@ -93,6 +98,11 @@ public class EmbeddedTitusCell {
             return this;
         }
 
+        public Builder withJobValidator(EntityValidator<JobDescriptor> validator) {
+            this.validator = validator;
+            return this;
+        }
+
         public EmbeddedTitusCell build() {
             Preconditions.checkNotNull(master, "TitusMaster not set");
             Preconditions.checkState(gateway != null || defaultGateway, "TitusGateway not set, nor default gateway requested");
@@ -101,13 +111,14 @@ public class EmbeddedTitusCell {
 
             if (defaultGateway) {
                 gateway = EmbeddedTitusGateway.aDefaultTitusGateway()
-                        .withMasterEndpoint("localhost", master.getGrpcPort(), master.getApiPort())
+                        .withMaster(master)
                         .withStore(master.getJobStore())
                         .withEnableREST(enableREST)
+                        .withJobValidator(validator)
                         .build();
             } else {
                 gateway = gateway.toBuilder()
-                        .withMasterEndpoint("localhost", master.getGrpcPort(), master.getApiPort())
+                        .withMaster(master)
                         .withStore(master.getJobStore())
                         .withEnableREST(enableREST)
                         .build();

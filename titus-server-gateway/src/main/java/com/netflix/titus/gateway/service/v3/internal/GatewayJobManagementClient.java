@@ -17,6 +17,7 @@
 package com.netflix.titus.gateway.service.v3.internal;
 
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,33 +30,41 @@ import javax.inject.Singleton;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
+import com.netflix.spectator.api.Registry;
 import com.netflix.titus.api.jobmanager.model.job.JobFunctions;
 import com.netflix.titus.api.jobmanager.model.job.TaskState;
 import com.netflix.titus.api.jobmanager.store.JobStore;
 import com.netflix.titus.api.jobmanager.store.JobStoreException;
-import com.netflix.titus.api.model.Page;
 import com.netflix.titus.api.model.Pagination;
 import com.netflix.titus.api.model.PaginationUtil;
 import com.netflix.titus.api.service.TitusServiceException;
 import com.netflix.titus.common.model.sanitizer.EntitySanitizer;
+import com.netflix.titus.common.model.validator.EntityValidator;
+import com.netflix.titus.common.model.validator.ValidationError;
+import com.netflix.titus.common.runtime.TitusRuntime;
 import com.netflix.titus.common.util.ExceptionExt;
 import com.netflix.titus.common.util.StringExt;
+import com.netflix.titus.common.util.rx.ReactorExt;
+import com.netflix.titus.common.util.time.Clock;
 import com.netflix.titus.common.util.tuple.Pair;
 import com.netflix.titus.gateway.service.v3.JobManagerConfiguration;
 import com.netflix.titus.grpc.protogen.Job;
+import com.netflix.titus.grpc.protogen.JobDescriptor;
 import com.netflix.titus.grpc.protogen.JobId;
 import com.netflix.titus.grpc.protogen.JobManagementServiceGrpc.JobManagementServiceStub;
+import com.netflix.titus.grpc.protogen.Page;
 import com.netflix.titus.grpc.protogen.Task;
 import com.netflix.titus.grpc.protogen.TaskId;
 import com.netflix.titus.grpc.protogen.TaskQuery;
 import com.netflix.titus.grpc.protogen.TaskQueryResult;
 import com.netflix.titus.runtime.connector.GrpcClientConfiguration;
+import com.netflix.titus.runtime.connector.jobmanager.JobManagementClient;
 import com.netflix.titus.runtime.connector.jobmanager.client.GrpcJobManagementClient;
 import com.netflix.titus.runtime.connector.jobmanager.client.JobManagementClientDelegate;
 import com.netflix.titus.runtime.endpoint.common.LogStorageInfo;
 import com.netflix.titus.runtime.endpoint.metadata.CallMetadataResolver;
 import com.netflix.titus.runtime.endpoint.v3.grpc.V3GrpcModelConverters;
-import com.netflix.titus.runtime.connector.jobmanager.JobManagementClient;
+import com.netflix.titus.runtime.jobmanager.JobManagerCursors;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
@@ -65,6 +74,7 @@ import rx.Observable;
 
 import static com.netflix.titus.api.jobmanager.model.job.sanitizer.JobSanitizerBuilder.JOB_STRICT_SANITIZER;
 import static com.netflix.titus.runtime.endpoint.common.grpc.CommonGrpcModelConverters.toGrpcPagination;
+import static com.netflix.titus.runtime.endpoint.common.grpc.CommonGrpcModelConverters.toPage;
 import static com.netflix.titus.runtime.endpoint.common.grpc.GrpcUtil.createRequestObservable;
 import static com.netflix.titus.runtime.endpoint.common.grpc.GrpcUtil.createSimpleClientResponseObserver;
 import static com.netflix.titus.runtime.endpoint.common.grpc.GrpcUtil.createWrappedStub;
@@ -83,6 +93,9 @@ public class GatewayJobManagementClient extends JobManagementClientDelegate {
     private final CallMetadataResolver callMetadataResolver;
     private final JobStore store;
     private final LogStorageInfo<com.netflix.titus.api.jobmanager.model.job.Task> logStorageInfo;
+    private final EntityValidator<com.netflix.titus.api.jobmanager.model.job.JobDescriptor> validator;
+    private final Registry spectatorRegistry;
+    private final Clock clock;
 
     @Inject
     public GatewayJobManagementClient(GrpcClientConfiguration configuration,
@@ -91,13 +104,54 @@ public class GatewayJobManagementClient extends JobManagementClientDelegate {
                                       CallMetadataResolver callMetadataResolver,
                                       JobStore store,
                                       LogStorageInfo<com.netflix.titus.api.jobmanager.model.job.Task> logStorageInfo,
-                                      @Named(JOB_STRICT_SANITIZER) EntitySanitizer entitySanitizer) {
-        super(new GrpcJobManagementClient(client, callMetadataResolver, new ExtendedJobSanitizer(jobManagerConfiguration, entitySanitizer), configuration));
+                                      @Named(JOB_STRICT_SANITIZER) EntitySanitizer entitySanitizer,
+                                      EntityValidator<com.netflix.titus.api.jobmanager.model.job.JobDescriptor> validator,
+                                      TitusRuntime titusRuntime) {
+        super(new GrpcJobManagementClient(
+                client,
+                callMetadataResolver,
+                new ExtendedJobSanitizer(jobManagerConfiguration, entitySanitizer),
+                configuration
+        ));
         this.configuration = configuration;
         this.client = client;
         this.callMetadataResolver = callMetadataResolver;
         this.store = store;
         this.logStorageInfo = logStorageInfo;
+        this.validator = validator;
+        this.spectatorRegistry = titusRuntime.getRegistry();
+        this.clock = titusRuntime.getClock();
+    }
+
+    @Override
+    public Observable<String> createJob(JobDescriptor jobDescriptor) {
+        com.netflix.titus.api.jobmanager.model.job.JobDescriptor coreJobDescriptor;
+        try {
+            coreJobDescriptor = V3GrpcModelConverters.toCoreJobDescriptor(jobDescriptor);
+        } catch (Exception e) {
+            return Observable.error(TitusServiceException.invalidArgument(e));
+        }
+
+        Observable<com.netflix.titus.api.jobmanager.model.job.JobDescriptor> sanitizedCoreJobDescriptorObs =
+                ReactorExt.toObservable(validator.sanitize(coreJobDescriptor))
+                        .onErrorResumeNext(throwable -> Observable.error(TitusServiceException.invalidArgument(throwable)))
+                        .flatMap(sanitizedCoreJobDescriptor -> ReactorExt.toObservable(validator.validate(sanitizedCoreJobDescriptor))
+                                .flatMap(errors -> {
+                                    // Report metrics on all errors
+                                    reportErrorMetrics(errors, sanitizedCoreJobDescriptor);
+
+                                    // Only emit an error on HARD validation errors
+                                    errors = errors.stream().filter(error -> error.isHard()).collect(Collectors.toSet());
+
+                                    if (!errors.isEmpty()) {
+                                        return Observable.error(TitusServiceException.invalidJob(errors));
+                                    } else {
+                                        return Observable.just(sanitizedCoreJobDescriptor);
+                                    }
+                                })
+                        );
+
+        return sanitizedCoreJobDescriptorObs.flatMap(scjd -> super.createJob(V3GrpcModelConverters.toGrpcJobDescriptor(scjd)));
     }
 
     @Override
@@ -138,26 +192,47 @@ public class GatewayJobManagementClient extends JobManagementClientDelegate {
 
     @Override
     public Observable<TaskQueryResult> findTasks(TaskQuery taskQuery) {
-        Observable<TaskQueryResult> observable = createRequestObservable(emitter -> {
+        Map<String, String> filteringCriteriaMap = taskQuery.getFilteringCriteriaMap();
+        Set<String> v3JobIds = new HashSet<>(StringExt.splitByComma(filteringCriteriaMap.getOrDefault("jobIds", "")));
+
+        Observable<TaskQueryResult> observable;
+        if (v3JobIds.isEmpty()) {
+            // Active task set only
+            observable = newActiveTaskQueryAction(taskQuery);
+        } else {
+            Set<String> taskStates = Sets.newHashSet(StringExt.splitByComma(taskQuery.getFilteringCriteriaMap().getOrDefault("taskStates", "")));
+
+            if (!taskStates.contains(TaskState.Finished.name())) {
+                // Active task set only
+                observable = newActiveTaskQueryAction(taskQuery);
+            } else {
+                Page page = taskQuery.getPage();
+                boolean nextPageByNumber = StringExt.isEmpty(page.getCursor()) && page.getPageNumber() > 0;
+
+                if (nextPageByNumber) {
+                    // In this case we ask for active and archived tasks using a page number > 0. Because of that
+                    // we have to fetch as much tasks from master as we can. Tasks that we do not fetch, will not be
+                    // visible to the client.
+                    TaskQuery largePageQuery = taskQuery.toBuilder().setPage(taskQuery.getPage().toBuilder().setPageNumber(0).setPageSize(configuration.getMaxTaskPageSize())).build();
+                    observable = newActiveTaskQueryAction(largePageQuery);
+                } else {
+                    observable = newActiveTaskQueryAction(taskQuery);
+                }
+
+                observable = observable.flatMap(result ->
+                        retrieveArchivedTasksForJobs(v3JobIds).map(archivedTasks -> combineTaskResults(taskQuery, result, archivedTasks))
+                );
+            }
+        }
+
+        return observable.timeout(configuration.getRequestTimeout(), TimeUnit.MILLISECONDS);
+    }
+
+    private Observable<TaskQueryResult> newActiveTaskQueryAction(TaskQuery taskQuery) {
+        return createRequestObservable(emitter -> {
             StreamObserver<TaskQueryResult> streamObserver = createSimpleClientResponseObserver(emitter);
             createWrappedStub(client, callMetadataResolver, configuration.getRequestTimeout()).findTasks(taskQuery, streamObserver);
         }, configuration.getRequestTimeout());
-
-        observable = observable.flatMap(result -> {
-            Map<String, String> filteringCriteriaMap = taskQuery.getFilteringCriteriaMap();
-            Set<String> v3JobIds = StringExt.splitByComma(filteringCriteriaMap.getOrDefault("jobIds", "")).stream()
-                    .filter(jobId -> !JobFunctions.isV2JobId(jobId))
-                    .collect(Collectors.toSet());
-            Set<String> taskStates = Sets.newHashSet(StringExt.splitByComma(filteringCriteriaMap.getOrDefault("taskStates", "")));
-            if (!v3JobIds.isEmpty() && taskStates.contains(TaskState.Finished.name())) {
-                return retrieveArchivedTasksForJobs(v3JobIds)
-                        .map(archivedTasks -> combineTaskResults(taskQuery, result.getItemsList(), archivedTasks));
-            } else {
-                return Observable.just(result);
-            }
-        });
-
-        return observable.timeout(configuration.getRequestTimeout(), TimeUnit.MILLISECONDS);
     }
 
     private Observable<Job> retrieveArchivedJob(String jobId) {
@@ -177,24 +252,13 @@ public class GatewayJobManagementClient extends JobManagementClientDelegate {
         return Observable.fromCallable(() -> jobIds.stream().map(store::retrieveArchivedTasksForJob).collect(Collectors.toList()))
                 .flatMap(observables -> Observable.merge(observables, MAX_CONCURRENT_JOBS_TO_RETRIEVE))
                 //TODO add filtering here but need to decide how to do this because most criteria is based on the job and not the task
-                .map(task -> V3GrpcModelConverters.toGrpcTask(task, logStorageInfo))
+                .map(task -> {
+                    com.netflix.titus.api.jobmanager.model.job.Task fixedTask = task.getStatus().getState() == TaskState.Finished
+                            ? task
+                            : JobFunctions.fixArchivedTaskStatus(task, clock);
+                    return V3GrpcModelConverters.toGrpcTask(fixedTask, logStorageInfo);
+                })
                 .toSortedList((first, second) -> Long.compare(first.getStatus().getTimestamp(), second.getStatus().getTimestamp()));
-    }
-
-    private TaskQueryResult combineTaskResults(TaskQuery taskQuery,
-                                               List<Task> activeTasks,
-                                               List<Task> archivedTasks) {
-        List<Task> tasks = deDupTasks(activeTasks, archivedTasks);
-        // TODO Set the cursor value after V2 engine is removed
-        Page page = new Page(taskQuery.getPage().getPageNumber(), taskQuery.getPage().getPageSize(), "");
-
-        // Cursors not supported for point queries.
-        Pair<List<Task>, Pagination> paginationPair = PaginationUtil.takePageWithoutCursor(page, tasks, task -> "");
-
-        return TaskQueryResult.newBuilder()
-                .addAllItems(paginationPair.getLeft())
-                .setPagination(toGrpcPagination(paginationPair.getRight()))
-                .build();
     }
 
     private Observable<Task> retrieveArchivedTask(String taskId) {
@@ -207,9 +271,50 @@ public class GatewayJobManagementClient extends JobManagementClientDelegate {
                         }
                     }
                     return Observable.error(TitusServiceException.unexpected("Not able to retrieve the task: %s (%s)", taskId, ExceptionExt.toMessageChain(e)));
-                }).map(task -> V3GrpcModelConverters.toGrpcTask(task, logStorageInfo));
+                })
+                .map(task -> {
+                    com.netflix.titus.api.jobmanager.model.job.Task fixedTask = task.getStatus().getState() == TaskState.Finished
+                            ? task
+                            : JobFunctions.fixArchivedTaskStatus(task, clock);
+                    return V3GrpcModelConverters.toGrpcTask(fixedTask, logStorageInfo);
+                });
     }
 
+    @VisibleForTesting
+    static TaskQueryResult combineTaskResults(TaskQuery taskQuery,
+                                              TaskQueryResult activeTasksResult,
+                                              List<Task> archivedTasks) {
+        List<Task> tasks = deDupTasks(activeTasksResult.getItemsList(), archivedTasks);
+
+        Pair<List<Task>, Pagination> paginationPair = PaginationUtil.takePageWithCursor(
+                toPage(taskQuery.getPage()),
+                tasks,
+                JobManagerCursors.taskCursorOrderComparator(),
+                JobManagerCursors::taskIndexOf,
+                JobManagerCursors::newCursorFrom
+        );
+
+        // Fix pagination result, as the total items count does not include all active tasks.
+        // The total could be larger than the actual number of tasks, as we are not filtering duplicates.
+        // This could be fixed in the future, when the gateway stores all active tasks in a local cache.
+        int allTasksCount = activeTasksResult.getPagination().getTotalItems() + archivedTasks.size();
+        Pair<List<Task>, Pagination> fixedPaginationPair = paginationPair.mapRight(p -> p.toBuilder()
+                .withTotalItems(allTasksCount)
+                .withTotalPages(PaginationUtil.numberOfPages(toPage(taskQuery.getPage()), allTasksCount))
+                .build()
+        );
+
+        return TaskQueryResult.newBuilder()
+                .addAllItems(fixedPaginationPair.getLeft())
+                .setPagination(toGrpcPagination(fixedPaginationPair.getRight()))
+                .build();
+    }
+
+    /**
+     * It is ok to find the same task in the active and the archived data set. This may happen as the active and the archive
+     * queries are run one after the other. In such case we know that the archive task is the latest copy, and should be
+     * returned to the client.
+     */
     @VisibleForTesting
     static List<Task> deDupTasks(List<Task> activeTasks, List<Task> archivedTasks) {
         Map<String, Task> archivedTasksMap = archivedTasks.stream().collect(Collectors.toMap(Task::getId, Function.identity()));
@@ -222,5 +327,15 @@ public class GatewayJobManagementClient extends JobManagementClientDelegate {
         }).collect(Collectors.toList());
         uniqueActiveTasks.addAll(archivedTasks);
         return uniqueActiveTasks;
+    }
+
+    private void reportErrorMetrics(Set<ValidationError> errors, com.netflix.titus.api.jobmanager.model.job.JobDescriptor jobDescriptor) {
+        errors.forEach(error ->
+                spectatorRegistry.counter(
+                        error.getField(),
+                        "type", error.getType().name(),
+                        "description", error.getDescription(),
+                        "application", jobDescriptor.getApplicationName())
+                        .increment());
     }
 }

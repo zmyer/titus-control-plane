@@ -1,15 +1,52 @@
+/*
+ * Copyright 2018 Netflix, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.netflix.titus.runtime.endpoint.v3.rest;
 
-import com.netflix.titus.grpc.protogen.*;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+
+import com.netflix.titus.common.runtime.SystemLogService;
+import com.netflix.titus.grpc.protogen.AddLoadBalancerRequest;
+import com.netflix.titus.grpc.protogen.GetAllLoadBalancersRequest;
+import com.netflix.titus.grpc.protogen.GetAllLoadBalancersResult;
+import com.netflix.titus.grpc.protogen.GetJobLoadBalancersResult;
+import com.netflix.titus.grpc.protogen.JobId;
+import com.netflix.titus.grpc.protogen.LoadBalancerId;
+import com.netflix.titus.grpc.protogen.Page;
+import com.netflix.titus.grpc.protogen.RemoveLoadBalancerRequest;
 import com.netflix.titus.runtime.endpoint.common.rest.Responses;
+import com.netflix.titus.runtime.endpoint.metadata.CallMetadataResolver;
 import com.netflix.titus.runtime.service.LoadBalancerService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
+import static com.netflix.titus.runtime.endpoint.v3.grpc.TitusPaginationUtils.logPageNumberUsage;
 
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -18,10 +55,16 @@ import javax.ws.rs.core.*;
 @Singleton
 public class LoadBalancerResource {
     private final LoadBalancerService loadBalancerService;
+    private final SystemLogService systemLog;
+    private final CallMetadataResolver callMetadataResolver;
 
     @Inject
-    public LoadBalancerResource(LoadBalancerService loadBalancerService) {
+    public LoadBalancerResource(LoadBalancerService loadBalancerService,
+                                SystemLogService systemLog,
+                                CallMetadataResolver callMetadataResolver) {
         this.loadBalancerService = loadBalancerService;
+        this.systemLog = systemLog;
+        this.callMetadataResolver = callMetadataResolver;
     }
 
     @GET
@@ -37,11 +80,12 @@ public class LoadBalancerResource {
     @GET
     @ApiOperation("Get all load balancers")
     public GetAllLoadBalancersResult getAllLoadBalancers(@Context UriInfo info) {
+        Page page = RestUtil.createPage(info.getQueryParameters());
+        logPageNumberUsage(systemLog, callMetadataResolver, getClass().getSimpleName(), "getAllLoadBalancers", page);
         return Responses.fromSingleValueObservable(
-                loadBalancerService.getAllLoadBalancers(
-                        GetAllLoadBalancersRequest.newBuilder()
-                                .setPage(RestUtil.createPage(info.getQueryParameters()))
-                                .build()));
+                loadBalancerService.getAllLoadBalancers(GetAllLoadBalancersRequest.newBuilder()
+                        .setPage(page)
+                        .build()));
     }
 
     @POST

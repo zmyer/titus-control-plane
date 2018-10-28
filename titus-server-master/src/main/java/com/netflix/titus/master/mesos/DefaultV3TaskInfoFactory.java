@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import com.google.common.base.Strings;
 import com.google.common.primitives.Ints;
 import com.netflix.fenzo.PreferentialNamedConsumableResourceSet;
 import com.netflix.fenzo.TaskRequest;
@@ -41,7 +42,6 @@ import com.netflix.titus.common.util.CollectionsExt;
 import com.netflix.titus.common.util.Evaluators;
 import com.netflix.titus.common.util.StringExt;
 import com.netflix.titus.master.config.MasterConfiguration;
-import com.netflix.titus.master.job.worker.WorkerRequest;
 import com.netflix.titus.master.model.job.TitusQueuableTask;
 import io.titanframework.messages.TitanProtos.ContainerInfo;
 import io.titanframework.messages.TitanProtos.ContainerInfo.EfsConfigInfo;
@@ -59,6 +59,9 @@ import static com.netflix.titus.common.util.Evaluators.applyNotNull;
  */
 @Singleton
 public class DefaultV3TaskInfoFactory implements TaskInfoFactory<Protos.TaskInfo> {
+
+    public static final String NETFLIX_APP_METADATA = "NETFLIX_APP_METADATA";
+    public static final String NETFLIX_APP_METADATA_SIG = "NETFLIX_APP_METADATA_SIG";
 
     private static final String PASSTHROUGH_ATTRIBUTES_PREFIX = "titusParameter.agent.";
     private static final String EXECUTOR_PER_TASK_LABEL = "executorpertask";
@@ -109,10 +112,7 @@ public class DefaultV3TaskInfoFactory implements TaskInfoFactory<Protos.TaskInfo
         SecurityProfile v3SecurityProfile = container.getSecurityProfile();
 
         // Docker Values (Image, entrypoint, and command)
-        Image image = container.getImage();
-        containerInfoBuilder.setImageName(image.getName());
-        applyNotNull(image.getDigest(), containerInfoBuilder::setImageDigest);
-        applyNotNull(image.getTag(), containerInfoBuilder::setVersion);
+        setImage(containerInfoBuilder, container.getImage());
         setEntryPointCommand(containerInfoBuilder, container);
 
         // Netflix Values
@@ -126,8 +126,8 @@ public class DefaultV3TaskInfoFactory implements TaskInfoFactory<Protos.TaskInfo
         }
 
         // Configure Metatron
-        String metatronAppMetadata = v3SecurityProfile.getAttributes().get(WorkerRequest.V2_NETFLIX_APP_METADATA);
-        String metatronAppSignature = v3SecurityProfile.getAttributes().get(WorkerRequest.V2_NETFLIX_APP_METADATA_SIG);
+        String metatronAppMetadata = v3SecurityProfile.getAttributes().get(NETFLIX_APP_METADATA);
+        String metatronAppSignature = v3SecurityProfile.getAttributes().get(NETFLIX_APP_METADATA_SIG);
         if (metatronAppMetadata != null && metatronAppSignature != null) {
             ContainerInfo.MetatronCreds.Builder metatronBuilder = ContainerInfo.MetatronCreds.newBuilder()
                     .setAppMetadata(metatronAppMetadata)
@@ -173,10 +173,8 @@ public class DefaultV3TaskInfoFactory implements TaskInfoFactory<Protos.TaskInfo
             containerInfoBuilder.putTitusProvidedEnv("TITUS_TASK_INDEX", "" + batchJobTask.getIndex());
         }
 
-        // Set whether or not to ignore the launch guard
-        if (mesosConfiguration.isV3IgnoreLaunchGuardEnabled()) {
-            containerInfoBuilder.setIgnoreLaunchGuard(true);
-        }
+        // Always set this to true until it is removed from the executor
+        containerInfoBuilder.setIgnoreLaunchGuard(true);
 
         // AWS Values
         // Configure IAM Role
@@ -204,6 +202,18 @@ public class DefaultV3TaskInfoFactory implements TaskInfoFactory<Protos.TaskInfo
         containerInfoBuilder.addAllEfsConfigInfo(setupEfsMounts(containerResources.getEfsMounts()));
 
         return containerInfoBuilder;
+    }
+
+    private void setImage(ContainerInfo.Builder containerInfoBuilder, Image image) {
+        containerInfoBuilder.setImageName(image.getName());
+        String registryUrl = mesosConfiguration.getRegistryUrl();
+        if (!Strings.isNullOrEmpty(registryUrl)) {
+            String updatedRegistryUrl = StringExt.appendToEndIfMissing(registryUrl, "/");
+            String fullQualifiedImage = updatedRegistryUrl + image.getName();
+            containerInfoBuilder.setFullyQualifiedImage(fullQualifiedImage);
+        }
+        applyNotNull(image.getDigest(), containerInfoBuilder::setImageDigest);
+        applyNotNull(image.getTag(), containerInfoBuilder::setVersion);
     }
 
     private void setEntryPointCommand(ContainerInfo.Builder containerInfoBuilder, Container container) {

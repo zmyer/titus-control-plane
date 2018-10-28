@@ -1,8 +1,30 @@
+/*
+ * Copyright 2018 Netflix, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.netflix.titus.runtime.endpoint.v3.rest;
 
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+
 import com.netflix.titus.api.service.TitusServiceException;
+import com.netflix.titus.common.runtime.SystemLogService;
 import com.netflix.titus.grpc.protogen.GetAllLoadBalancersResult;
 import com.netflix.titus.grpc.protogen.GetJobLoadBalancersResult;
+import com.netflix.titus.runtime.endpoint.metadata.CallMetadataResolver;
 import com.netflix.titus.runtime.service.LoadBalancerService;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.junit.Before;
@@ -11,10 +33,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import rx.Completable;
 import rx.Observable;
-
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.MultivaluedMap;
 
 import static com.netflix.titus.runtime.endpoint.v3.rest.RestConstants.CURSOR_QUERY_KEY;
 import static com.netflix.titus.runtime.endpoint.v3.rest.RestConstants.PAGE_QUERY_KEY;
@@ -28,8 +46,15 @@ import static org.mockito.Mockito.when;
  * Tests the {@link LoadBalancerResource} class.
  */
 public class LoadBalancerResourceTest {
-    @Mock private LoadBalancerService loadBalancerService;
-    @Mock private UriInfo uriInfo;
+    @Mock
+    private LoadBalancerService loadBalancerService;
+    @Mock
+    private UriInfo uriInfo;
+    @Mock
+    private SystemLogService systemLog;
+    @Mock
+    private CallMetadataResolver callMetadataResolver;
+
 
     private LoadBalancerResource loadBalancerResource;
 
@@ -39,7 +64,7 @@ public class LoadBalancerResourceTest {
     @Before
     public void beforeAll() {
         MockitoAnnotations.initMocks(this);
-        this.loadBalancerResource = new LoadBalancerResource(loadBalancerService);
+        this.loadBalancerResource = new LoadBalancerResource(loadBalancerService, systemLog, callMetadataResolver);
     }
 
     @Test

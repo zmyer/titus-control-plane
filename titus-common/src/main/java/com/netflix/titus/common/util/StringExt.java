@@ -84,6 +84,26 @@ public final class StringExt {
     }
 
     /**
+     * Return prefix until first occurrence of the end marker.
+     */
+    public static String takeUntil(String value, String endMarker) {
+        if(value == null) {
+            return "";
+        }
+        if(endMarker == null) {
+            return value;
+        }
+        if(value.length() < endMarker.length()) {
+            return value;
+        }
+        int idx = value.indexOf(endMarker);
+        if(idx < 0) {
+            return value;
+        }
+        return value.substring(0, idx);
+    }
+
+    /**
      * Pass a string value to the consumer if it is not null, and non-empty.
      */
     public static void applyIfNonEmpty(String value, Consumer<String> consumer) {
@@ -164,6 +184,23 @@ public final class StringExt {
      */
     public static <E extends Enum> String concatenate(E[] array, String delimiter) {
         return concatenate(array, delimiter, Enum::name);
+    }
+
+    /**
+     * Concatenate enum values.
+     */
+    public static <E extends Enum> String concatenate(Class<E> enumType, String delimiter, Function<E, Boolean> filter) {
+        StringBuilder sb = new StringBuilder();
+        for (E value : enumType.getEnumConstants()) {
+            if (filter.apply(value)) {
+                sb.append(value).append(delimiter);
+            }
+        }
+        if (sb.length() == 0) {
+            return "";
+        }
+        sb.setLength(sb.length() - delimiter.length());
+        return sb.toString();
     }
 
     /**
@@ -397,5 +434,12 @@ public final class StringExt {
 
     public static String doubleQuotes(String text) {
         return "\"" + text + "\"";
+    }
+
+    /**
+     * Append the value to the end of the text if the value is not already there.
+     */
+    public static String appendToEndIfMissing(String text, String value) {
+        return text.endsWith(value) ? text : text + value;
     }
 }

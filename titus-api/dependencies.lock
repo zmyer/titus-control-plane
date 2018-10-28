@@ -38,6 +38,12 @@
                 "org.hibernate:hibernate-validator"
             ]
         },
+        "com.github.akarnokd:rxjava2-interop": {
+            "locked": "0.13.2",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
         "com.github.ben-manes.caffeine:caffeine": {
             "locked": "2.6.2",
             "transitive": [
@@ -220,7 +226,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -228,50 +234,76 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
+                "io.netty:netty-codec-socks",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
+                "io.netty:netty-handler-proxy",
+                "io.projectreactor.ipc:reactor-netty",
                 "io.reactivex:rxnetty"
+            ]
+        },
+        "io.netty:netty-codec-socks": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.netty:netty-handler-proxy"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
+                "io.projectreactor.ipc:reactor-netty",
                 "io.reactivex:rxnetty"
             ]
         },
+        "io.netty:netty-handler-proxy": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.projectreactor.ipc:reactor-netty"
+            ]
+        },
         "io.netty:netty-resolver": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-handler-proxy",
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
+                "io.projectreactor.ipc:reactor-netty",
                 "io.reactivex:rxnetty"
+            ]
+        },
+        "io.netty:netty-transport-native-unix-common": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.netty:netty-transport-native-epoll"
             ]
         },
         "io.opencensus:opencensus-api": {
@@ -287,9 +319,36 @@
                 "io.grpc:grpc-core"
             ]
         },
+        "io.projectreactor.addons:reactor-adapter": {
+            "locked": "3.1.7.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
+        "io.projectreactor.ipc:reactor-netty": {
+            "locked": "0.7.11.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
+        "io.projectreactor:reactor-core": {
+            "locked": "3.1.11.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common",
+                "io.projectreactor.addons:reactor-adapter",
+                "io.projectreactor.ipc:reactor-netty"
+            ]
+        },
+        "io.reactivex.rxjava2:rxjava": {
+            "locked": "2.2.2",
+            "transitive": [
+                "com.github.akarnokd:rxjava2-interop"
+            ]
+        },
         "io.reactivex:rxjava": {
             "locked": "1.3.8",
             "transitive": [
+                "com.github.akarnokd:rxjava2-interop",
                 "com.netflix.titus:titus-common",
                 "io.reactivex:rxnetty"
             ]
@@ -315,10 +374,22 @@
                 "com.netflix.governator:governator-core"
             ]
         },
+        "javax.servlet:javax.servlet-api": {
+            "locked": "3.1.0",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
         "javax.validation:validation-api": {
             "locked": "1.1.0.Final",
             "transitive": [
                 "org.hibernate:hibernate-validator"
+            ]
+        },
+        "javax.ws.rs:jsr311-api": {
+            "locked": "1.1.1",
+            "transitive": [
+                "com.netflix.titus:titus-common"
             ]
         },
         "log4j:log4j": {
@@ -355,6 +426,14 @@
             "locked": "3.3.0.Final",
             "transitive": [
                 "org.hibernate:hibernate-validator"
+            ]
+        },
+        "org.reactivestreams:reactive-streams": {
+            "locked": "1.0.2",
+            "transitive": [
+                "com.github.akarnokd:rxjava2-interop",
+                "io.projectreactor:reactor-core",
+                "io.reactivex.rxjava2:rxjava"
             ]
         },
         "org.slf4j:slf4j-api": {
@@ -433,6 +512,12 @@
                 "org.hibernate:hibernate-validator"
             ]
         },
+        "com.github.akarnokd:rxjava2-interop": {
+            "locked": "0.13.2",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
         "com.github.ben-manes.caffeine:caffeine": {
             "locked": "2.6.2",
             "transitive": [
@@ -615,7 +700,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -623,50 +708,76 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
+                "io.netty:netty-codec-socks",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
+                "io.netty:netty-handler-proxy",
+                "io.projectreactor.ipc:reactor-netty",
                 "io.reactivex:rxnetty"
+            ]
+        },
+        "io.netty:netty-codec-socks": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.netty:netty-handler-proxy"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
+                "io.projectreactor.ipc:reactor-netty",
                 "io.reactivex:rxnetty"
             ]
         },
+        "io.netty:netty-handler-proxy": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.projectreactor.ipc:reactor-netty"
+            ]
+        },
         "io.netty:netty-resolver": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-handler-proxy",
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
+                "io.projectreactor.ipc:reactor-netty",
                 "io.reactivex:rxnetty"
+            ]
+        },
+        "io.netty:netty-transport-native-unix-common": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.netty:netty-transport-native-epoll"
             ]
         },
         "io.opencensus:opencensus-api": {
@@ -682,9 +793,36 @@
                 "io.grpc:grpc-core"
             ]
         },
+        "io.projectreactor.addons:reactor-adapter": {
+            "locked": "3.1.7.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
+        "io.projectreactor.ipc:reactor-netty": {
+            "locked": "0.7.11.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
+        "io.projectreactor:reactor-core": {
+            "locked": "3.1.11.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common",
+                "io.projectreactor.addons:reactor-adapter",
+                "io.projectreactor.ipc:reactor-netty"
+            ]
+        },
+        "io.reactivex.rxjava2:rxjava": {
+            "locked": "2.2.2",
+            "transitive": [
+                "com.github.akarnokd:rxjava2-interop"
+            ]
+        },
         "io.reactivex:rxjava": {
             "locked": "1.3.8",
             "transitive": [
+                "com.github.akarnokd:rxjava2-interop",
                 "com.netflix.titus:titus-common",
                 "io.reactivex:rxnetty"
             ]
@@ -710,10 +848,22 @@
                 "com.netflix.governator:governator-core"
             ]
         },
+        "javax.servlet:javax.servlet-api": {
+            "locked": "3.1.0",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
         "javax.validation:validation-api": {
             "locked": "1.1.0.Final",
             "transitive": [
                 "org.hibernate:hibernate-validator"
+            ]
+        },
+        "javax.ws.rs:jsr311-api": {
+            "locked": "1.1.1",
+            "transitive": [
+                "com.netflix.titus:titus-common"
             ]
         },
         "log4j:log4j": {
@@ -750,6 +900,14 @@
             "locked": "3.3.0.Final",
             "transitive": [
                 "org.hibernate:hibernate-validator"
+            ]
+        },
+        "org.reactivestreams:reactive-streams": {
+            "locked": "1.0.2",
+            "transitive": [
+                "com.github.akarnokd:rxjava2-interop",
+                "io.projectreactor:reactor-core",
+                "io.reactivex.rxjava2:rxjava"
             ]
         },
         "org.slf4j:slf4j-api": {
@@ -828,6 +986,12 @@
                 "org.hibernate:hibernate-validator"
             ]
         },
+        "com.github.akarnokd:rxjava2-interop": {
+            "locked": "0.13.2",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
         "com.github.ben-manes.caffeine:caffeine": {
             "locked": "2.6.2",
             "transitive": [
@@ -1010,7 +1174,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -1018,50 +1182,76 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
+                "io.netty:netty-codec-socks",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
+                "io.netty:netty-handler-proxy",
+                "io.projectreactor.ipc:reactor-netty",
                 "io.reactivex:rxnetty"
+            ]
+        },
+        "io.netty:netty-codec-socks": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.netty:netty-handler-proxy"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
+                "io.projectreactor.ipc:reactor-netty",
                 "io.reactivex:rxnetty"
             ]
         },
+        "io.netty:netty-handler-proxy": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.projectreactor.ipc:reactor-netty"
+            ]
+        },
         "io.netty:netty-resolver": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-handler-proxy",
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
+                "io.projectreactor.ipc:reactor-netty",
                 "io.reactivex:rxnetty"
+            ]
+        },
+        "io.netty:netty-transport-native-unix-common": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.netty:netty-transport-native-epoll"
             ]
         },
         "io.opencensus:opencensus-api": {
@@ -1077,9 +1267,36 @@
                 "io.grpc:grpc-core"
             ]
         },
+        "io.projectreactor.addons:reactor-adapter": {
+            "locked": "3.1.7.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
+        "io.projectreactor.ipc:reactor-netty": {
+            "locked": "0.7.11.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
+        "io.projectreactor:reactor-core": {
+            "locked": "3.1.11.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common",
+                "io.projectreactor.addons:reactor-adapter",
+                "io.projectreactor.ipc:reactor-netty"
+            ]
+        },
+        "io.reactivex.rxjava2:rxjava": {
+            "locked": "2.2.2",
+            "transitive": [
+                "com.github.akarnokd:rxjava2-interop"
+            ]
+        },
         "io.reactivex:rxjava": {
             "locked": "1.3.8",
             "transitive": [
+                "com.github.akarnokd:rxjava2-interop",
                 "com.netflix.titus:titus-common",
                 "io.reactivex:rxnetty"
             ]
@@ -1105,10 +1322,22 @@
                 "com.netflix.governator:governator-core"
             ]
         },
+        "javax.servlet:javax.servlet-api": {
+            "locked": "3.1.0",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
         "javax.validation:validation-api": {
             "locked": "1.1.0.Final",
             "transitive": [
                 "org.hibernate:hibernate-validator"
+            ]
+        },
+        "javax.ws.rs:jsr311-api": {
+            "locked": "1.1.1",
+            "transitive": [
+                "com.netflix.titus:titus-common"
             ]
         },
         "log4j:log4j": {
@@ -1145,6 +1374,14 @@
             "locked": "3.3.0.Final",
             "transitive": [
                 "org.hibernate:hibernate-validator"
+            ]
+        },
+        "org.reactivestreams:reactive-streams": {
+            "locked": "1.0.2",
+            "transitive": [
+                "com.github.akarnokd:rxjava2-interop",
+                "io.projectreactor:reactor-core",
+                "io.reactivex.rxjava2:rxjava"
             ]
         },
         "org.slf4j:slf4j-api": {
@@ -1287,6 +1524,12 @@
                 "org.hibernate:hibernate-validator"
             ]
         },
+        "com.github.akarnokd:rxjava2-interop": {
+            "locked": "0.13.2",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
         "com.github.ben-manes.caffeine:caffeine": {
             "locked": "2.6.2",
             "transitive": [
@@ -1469,7 +1712,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -1477,50 +1720,76 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
+                "io.netty:netty-codec-socks",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
+                "io.netty:netty-handler-proxy",
+                "io.projectreactor.ipc:reactor-netty",
                 "io.reactivex:rxnetty"
+            ]
+        },
+        "io.netty:netty-codec-socks": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.netty:netty-handler-proxy"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
+                "io.projectreactor.ipc:reactor-netty",
                 "io.reactivex:rxnetty"
             ]
         },
+        "io.netty:netty-handler-proxy": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.projectreactor.ipc:reactor-netty"
+            ]
+        },
         "io.netty:netty-resolver": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-handler-proxy",
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
+                "io.projectreactor.ipc:reactor-netty",
                 "io.reactivex:rxnetty"
+            ]
+        },
+        "io.netty:netty-transport-native-unix-common": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.netty:netty-transport-native-epoll"
             ]
         },
         "io.opencensus:opencensus-api": {
@@ -1536,9 +1805,36 @@
                 "io.grpc:grpc-core"
             ]
         },
+        "io.projectreactor.addons:reactor-adapter": {
+            "locked": "3.1.7.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
+        "io.projectreactor.ipc:reactor-netty": {
+            "locked": "0.7.11.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
+        "io.projectreactor:reactor-core": {
+            "locked": "3.1.11.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common",
+                "io.projectreactor.addons:reactor-adapter",
+                "io.projectreactor.ipc:reactor-netty"
+            ]
+        },
+        "io.reactivex.rxjava2:rxjava": {
+            "locked": "2.2.2",
+            "transitive": [
+                "com.github.akarnokd:rxjava2-interop"
+            ]
+        },
         "io.reactivex:rxjava": {
             "locked": "1.3.8",
             "transitive": [
+                "com.github.akarnokd:rxjava2-interop",
                 "com.netflix.titus:titus-common",
                 "io.reactivex:rxnetty"
             ]
@@ -1564,10 +1860,22 @@
                 "com.netflix.governator:governator-core"
             ]
         },
+        "javax.servlet:javax.servlet-api": {
+            "locked": "3.1.0",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
         "javax.validation:validation-api": {
             "locked": "1.1.0.Final",
             "transitive": [
                 "org.hibernate:hibernate-validator"
+            ]
+        },
+        "javax.ws.rs:jsr311-api": {
+            "locked": "1.1.1",
+            "transitive": [
+                "com.netflix.titus:titus-common"
             ]
         },
         "log4j:log4j": {
@@ -1604,6 +1912,14 @@
             "locked": "3.3.0.Final",
             "transitive": [
                 "org.hibernate:hibernate-validator"
+            ]
+        },
+        "org.reactivestreams:reactive-streams": {
+            "locked": "1.0.2",
+            "transitive": [
+                "com.github.akarnokd:rxjava2-interop",
+                "io.projectreactor:reactor-core",
+                "io.reactivex.rxjava2:rxjava"
             ]
         },
         "org.slf4j:slf4j-api": {
@@ -1683,6 +1999,12 @@
                 "org.hibernate:hibernate-validator"
             ]
         },
+        "com.github.akarnokd:rxjava2-interop": {
+            "locked": "0.13.2",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
         "com.github.ben-manes.caffeine:caffeine": {
             "locked": "2.6.2",
             "transitive": [
@@ -1865,7 +2187,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -1873,50 +2195,76 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
+                "io.netty:netty-codec-socks",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
+                "io.netty:netty-handler-proxy",
+                "io.projectreactor.ipc:reactor-netty",
                 "io.reactivex:rxnetty"
+            ]
+        },
+        "io.netty:netty-codec-socks": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.netty:netty-handler-proxy"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
+                "io.projectreactor.ipc:reactor-netty",
                 "io.reactivex:rxnetty"
             ]
         },
+        "io.netty:netty-handler-proxy": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.projectreactor.ipc:reactor-netty"
+            ]
+        },
         "io.netty:netty-resolver": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-handler-proxy",
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
+                "io.projectreactor.ipc:reactor-netty",
                 "io.reactivex:rxnetty"
+            ]
+        },
+        "io.netty:netty-transport-native-unix-common": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.netty:netty-transport-native-epoll"
             ]
         },
         "io.opencensus:opencensus-api": {
@@ -1932,9 +2280,36 @@
                 "io.grpc:grpc-core"
             ]
         },
+        "io.projectreactor.addons:reactor-adapter": {
+            "locked": "3.1.7.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
+        "io.projectreactor.ipc:reactor-netty": {
+            "locked": "0.7.11.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
+        "io.projectreactor:reactor-core": {
+            "locked": "3.1.11.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common",
+                "io.projectreactor.addons:reactor-adapter",
+                "io.projectreactor.ipc:reactor-netty"
+            ]
+        },
+        "io.reactivex.rxjava2:rxjava": {
+            "locked": "2.2.2",
+            "transitive": [
+                "com.github.akarnokd:rxjava2-interop"
+            ]
+        },
         "io.reactivex:rxjava": {
             "locked": "1.3.8",
             "transitive": [
+                "com.github.akarnokd:rxjava2-interop",
                 "com.netflix.titus:titus-common",
                 "io.reactivex:rxnetty"
             ]
@@ -1960,10 +2335,22 @@
                 "com.netflix.governator:governator-core"
             ]
         },
+        "javax.servlet:javax.servlet-api": {
+            "locked": "3.1.0",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
         "javax.validation:validation-api": {
             "locked": "1.1.0.Final",
             "transitive": [
                 "org.hibernate:hibernate-validator"
+            ]
+        },
+        "javax.ws.rs:jsr311-api": {
+            "locked": "1.1.1",
+            "transitive": [
+                "com.netflix.titus:titus-common"
             ]
         },
         "log4j:log4j": {
@@ -2000,6 +2387,14 @@
             "locked": "3.3.0.Final",
             "transitive": [
                 "org.hibernate:hibernate-validator"
+            ]
+        },
+        "org.reactivestreams:reactive-streams": {
+            "locked": "1.0.2",
+            "transitive": [
+                "com.github.akarnokd:rxjava2-interop",
+                "io.projectreactor:reactor-core",
+                "io.reactivex.rxjava2:rxjava"
             ]
         },
         "org.slf4j:slf4j-api": {
@@ -2059,6 +2454,21 @@
                 "com.jayway.awaitility:awaitility"
             ]
         },
+        "ch.qos.logback:logback-classic": {
+            "locked": "1.1.3",
+            "transitive": [
+                "org.mock-server:mockserver-client-java",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-logging",
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "ch.qos.logback:logback-core": {
+            "locked": "1.1.3",
+            "transitive": [
+                "ch.qos.logback:logback-classic"
+            ]
+        },
         "com.addthis.metrics:reporter-config-base": {
             "locked": "3.0.0",
             "transitive": [
@@ -2108,7 +2518,8 @@
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.fenzo:fenzo-triggers",
                 "io.swagger:swagger-core",
-                "io.swagger:swagger-models"
+                "io.swagger:swagger-models",
+                "org.mock-server:mockserver-core"
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
@@ -2116,17 +2527,20 @@
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
-                "com.fasterxml.jackson.datatype:jackson-datatype-jdk8"
+                "com.fasterxml.jackson.datatype:jackson-datatype-jdk8",
+                "org.mock-server:mockserver-core"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
             "locked": "2.8.7",
             "transitive": [
                 "com.fasterxml.jackson.datatype:jackson-datatype-jdk8",
+                "com.github.fge:jackson-coreutils",
                 "com.netflix.fenzo:fenzo-core",
                 "com.netflix.titus:titus-common",
                 "io.swagger:swagger-core",
-                "io.swagger:swagger-jaxrs"
+                "io.swagger:swagger-jaxrs",
+                "org.mock-server:mockserver-core"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
@@ -2147,11 +2561,54 @@
                 "org.hibernate:hibernate-validator"
             ]
         },
+        "com.github.akarnokd:rxjava2-interop": {
+            "locked": "0.13.2",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
         "com.github.ben-manes.caffeine:caffeine": {
             "locked": "2.6.2",
             "transitive": [
                 "com.netflix.titus:titus-common",
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "com.github.fge:btf": {
+            "locked": "1.2",
+            "transitive": [
+                "com.github.fge:msg-simple"
+            ]
+        },
+        "com.github.fge:jackson-coreutils": {
+            "locked": "1.8",
+            "transitive": [
+                "com.github.fge:json-schema-core"
+            ]
+        },
+        "com.github.fge:json-schema-core": {
+            "locked": "1.2.5",
+            "transitive": [
+                "com.github.fge:json-schema-validator"
+            ]
+        },
+        "com.github.fge:json-schema-validator": {
+            "locked": "2.2.6",
+            "transitive": [
+                "org.mock-server:mockserver-core"
+            ]
+        },
+        "com.github.fge:msg-simple": {
+            "locked": "1.1",
+            "transitive": [
+                "com.github.fge:jackson-coreutils",
+                "com.github.fge:uri-template"
+            ]
+        },
+        "com.github.fge:uri-template": {
+            "locked": "0.9",
+            "transitive": [
+                "com.github.fge:json-schema-core"
             ]
         },
         "com.github.jbellis:jamm": {
@@ -2219,6 +2676,14 @@
         "com.google.code.findbugs:jsr305": {
             "locked": "3.0.0",
             "transitive": [
+                "com.github.fge:btf",
+                "com.github.fge:jackson-coreutils",
+                "com.github.fge:json-schema-core",
+                "com.github.fge:json-schema-validator",
+                "com.github.fge:msg-simple",
+                "com.github.fge:uri-template",
+                "com.twitter:util-cache_2.11",
+                "com.twitter:util-collection_2.11",
                 "io.grpc:grpc-core"
             ]
         },
@@ -2240,9 +2705,15 @@
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.datastax.cassandra:cassandra-driver-extras",
+                "com.github.fge:jackson-coreutils",
+                "com.github.fge:uri-template",
                 "com.google.inject:guice",
                 "com.google.protobuf:protobuf-java-util",
                 "com.netflix.titus:titus-common",
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:finagle-http_2.11",
+                "com.twitter:util-cache_2.11",
+                "com.twitter:util-collection_2.11",
                 "io.grpc:grpc-core",
                 "io.grpc:grpc-protobuf",
                 "io.grpc:grpc-protobuf-lite",
@@ -2253,6 +2724,9 @@
                 "org.apache.curator:curator-client",
                 "org.caffinitas.ohc:ohc-core",
                 "org.cassandraunit:cassandra-unit",
+                "org.mock-server:mockserver-client-java",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty",
                 "org.reflections:reflections"
             ]
         },
@@ -2333,9 +2807,21 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "com.googlecode.libphonenumber:libphonenumber": {
+            "locked": "6.2",
+            "transitive": [
+                "com.github.fge:json-schema-validator"
+            ]
+        },
         "com.jayway.awaitility:awaitility": {
             "locked": "1.7.0",
             "requested": "1.7.0"
+        },
+        "com.jcraft:jzlib": {
+            "locked": "1.1.3",
+            "transitive": [
+                "org.mock-server:mockserver-core"
+            ]
         },
         "com.lmax:disruptor": {
             "locked": "3.0.1",
@@ -2570,6 +3056,119 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "com.twitter:finagle-core_2.11": {
+            "locked": "6.33.0",
+            "transitive": [
+                "com.twitter:finagle-http_2.11",
+                "com.twitter:finagle-native_2.11"
+            ]
+        },
+        "com.twitter:finagle-http_2.11": {
+            "locked": "6.33.0",
+            "transitive": [
+                "com.twitter:finagle-native_2.11"
+            ]
+        },
+        "com.twitter:finagle-native_2.11": {
+            "locked": "6.33.0",
+            "transitive": [
+                "org.mock-server:mockserver-core"
+            ]
+        },
+        "com.twitter:jsr166e": {
+            "locked": "1.0.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-core_2.11"
+            ]
+        },
+        "com.twitter:util-app_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-jvm_2.11",
+                "com.twitter:util-logging_2.11"
+            ]
+        },
+        "com.twitter:util-cache_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11"
+            ]
+        },
+        "com.twitter:util-codec_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:finagle-http_2.11"
+            ]
+        },
+        "com.twitter:util-collection_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11"
+            ]
+        },
+        "com.twitter:util-core_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-app_2.11",
+                "com.twitter:util-cache_2.11",
+                "com.twitter:util-codec_2.11",
+                "com.twitter:util-collection_2.11",
+                "com.twitter:util-jvm_2.11",
+                "com.twitter:util-logging_2.11",
+                "com.twitter:util-registry_2.11",
+                "com.twitter:util-stats_2.11"
+            ]
+        },
+        "com.twitter:util-function_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:util-core_2.11"
+            ]
+        },
+        "com.twitter:util-hashing_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11"
+            ]
+        },
+        "com.twitter:util-jvm_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11"
+            ]
+        },
+        "com.twitter:util-lint_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-stats_2.11"
+            ]
+        },
+        "com.twitter:util-logging_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:finagle-http_2.11"
+            ]
+        },
+        "com.twitter:util-registry_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-app_2.11"
+            ]
+        },
+        "com.twitter:util-stats_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-logging_2.11"
+            ]
+        },
         "commons-cli:commons-cli": {
             "locked": "1.3.1",
             "transitive": [
@@ -2579,9 +3178,29 @@
             ]
         },
         "commons-codec:commons-codec": {
-            "locked": "1.2",
+            "locked": "1.9",
             "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-codec_2.11",
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "commons-collections:commons-collections": {
+            "locked": "3.2.1",
+            "transitive": [
+                "com.twitter:util-collection_2.11"
+            ]
+        },
+        "commons-io:commons-io": {
+            "locked": "1.3.2",
+            "transitive": [
+                "org.apache.commons:commons-io"
+            ]
+        },
+        "commons-lang:commons-lang": {
+            "locked": "2.6",
+            "transitive": [
+                "com.twitter:finagle-http_2.11"
             ]
         },
         "commons-logging:commons-logging": {
@@ -2655,66 +3274,105 @@
             ]
         },
         "io.netty:netty": {
-            "locked": "3.7.0.Final",
+            "locked": "3.10.1.Final",
             "transitive": [
+                "com.twitter:finagle-core_2.11",
                 "org.apache.zookeeper:zookeeper"
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty"
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
-                "io.netty:netty-handler"
+                "io.netty:netty-codec-socks",
+                "io.netty:netty-handler",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
-                "io.reactivex:rxnetty"
+                "io.netty:netty-handler-proxy",
+                "io.projectreactor.ipc:reactor-netty",
+                "io.reactivex:rxnetty",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "io.netty:netty-codec-socks": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.netty:netty-handler-proxy",
+                "org.mock-server:mockserver-core"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common",
+                "org.mock-server:mockserver-netty"
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
+                "io.projectreactor.ipc:reactor-netty",
                 "io.reactivex:rxnetty",
-                "org.cassandraunit:cassandra-unit"
+                "org.cassandraunit:cassandra-unit",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "io.netty:netty-handler-proxy": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.projectreactor.ipc:reactor-netty"
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-handler-proxy",
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty"
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
+                "io.projectreactor.ipc:reactor-netty",
                 "io.reactivex:rxnetty"
+            ]
+        },
+        "io.netty:netty-transport-native-unix-common": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.netty:netty-transport-native-epoll"
             ]
         },
         "io.opencensus:opencensus-api": {
@@ -2730,9 +3388,41 @@
                 "io.grpc:grpc-core"
             ]
         },
+        "io.projectreactor.addons:reactor-adapter": {
+            "locked": "3.1.7.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
+        "io.projectreactor.ipc:reactor-netty": {
+            "locked": "0.7.11.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
+        "io.projectreactor:reactor-core": {
+            "locked": "3.1.11.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common",
+                "io.projectreactor.addons:reactor-adapter",
+                "io.projectreactor.ipc:reactor-netty",
+                "io.projectreactor:reactor-test"
+            ]
+        },
+        "io.projectreactor:reactor-test": {
+            "locked": "3.1.11.RELEASE",
+            "requested": "3.1.+"
+        },
+        "io.reactivex.rxjava2:rxjava": {
+            "locked": "2.2.2",
+            "transitive": [
+                "com.github.akarnokd:rxjava2-interop"
+            ]
+        },
         "io.reactivex:rxjava": {
             "locked": "1.3.8",
             "transitive": [
+                "com.github.akarnokd:rxjava2-interop",
                 "com.netflix.fenzo:fenzo-triggers",
                 "com.netflix.titus:titus-common",
                 "io.reactivex:rxnetty"
@@ -2777,6 +3467,18 @@
                 "com.clearspring.analytics:stream"
             ]
         },
+        "janino:janino": {
+            "locked": "2.5.10",
+            "transitive": [
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "javax.activation:activation": {
+            "locked": "1.1",
+            "transitive": [
+                "javax.mail:mailapi"
+            ]
+        },
         "javax.el:javax.el-api": {
             "locked": "3.0.1-b06",
             "transitive": [
@@ -2794,17 +3496,26 @@
                 "com.netflix.governator:governator-providers",
                 "com.netflix.runtime:health-core",
                 "com.netflix.titus:titus-server-master",
-                "com.sun.jersey.contribs:jersey-guice"
+                "com.sun.jersey.contribs:jersey-guice",
+                "com.twitter:util-collection_2.11"
+            ]
+        },
+        "javax.mail:mailapi": {
+            "locked": "1.4.3",
+            "transitive": [
+                "com.github.fge:json-schema-validator"
             ]
         },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.1.0",
             "transitive": [
+                "com.netflix.titus:titus-common",
                 "com.netflix.titus:titus-server-gateway",
                 "com.netflix.titus:titus-server-master",
                 "com.netflix.titus:titus-server-runtime",
                 "com.netflix.titus:titus-testkit",
-                "org.eclipse.jetty:jetty-server"
+                "org.eclipse.jetty:jetty-server",
+                "org.mock-server:mockserver-core"
             ]
         },
         "javax.validation:validation-api": {
@@ -2817,6 +3528,7 @@
         "javax.ws.rs:jsr311-api": {
             "locked": "1.1.1",
             "transitive": [
+                "com.netflix.titus:titus-common",
                 "com.sun.jersey:jersey-core",
                 "io.swagger:swagger-jaxrs"
             ]
@@ -2830,6 +3542,7 @@
         "joda-time:joda-time": {
             "locked": "2.9.9",
             "transitive": [
+                "com.github.fge:json-schema-validator",
                 "com.netflix.fenzo:fenzo-triggers",
                 "org.apache.cassandra:cassandra-all"
             ]
@@ -2837,7 +3550,8 @@
         "junit:junit": {
             "locked": "4.12",
             "transitive": [
-                "org.cassandraunit:cassandra-unit"
+                "org.cassandraunit:cassandra-unit",
+                "org.mock-server:mockserver-netty"
             ]
         },
         "junit:junit-dep": {
@@ -2855,13 +3569,13 @@
             ]
         },
         "net.bytebuddy:byte-buddy": {
-            "locked": "1.8.15",
+            "locked": "1.9.0",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
         },
         "net.bytebuddy:byte-buddy-agent": {
-            "locked": "1.8.15",
+            "locked": "1.9.0",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -2883,6 +3597,12 @@
             "locked": "1.0",
             "transitive": [
                 "org.apache.cassandra:cassandra-thrift"
+            ]
+        },
+        "net.sf.jopt-simple:jopt-simple": {
+            "locked": "4.6",
+            "transitive": [
+                "com.github.fge:json-schema-validator"
             ]
         },
         "org.antlr:ST4": {
@@ -2917,6 +3637,12 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "org.apache.commons:commons-io": {
+            "locked": "1.3.2",
+            "transitive": [
+                "org.mock-server:mockserver-core"
+            ]
+        },
         "org.apache.commons:commons-lang3": {
             "locked": "3.4",
             "transitive": [
@@ -2926,7 +3652,9 @@
                 "io.swagger:swagger-core",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",
-                "org.cassandraunit:cassandra-unit"
+                "org.cassandraunit:cassandra-unit",
+                "org.mock-server:mockserver-client-java",
+                "org.mock-server:mockserver-core"
             ]
         },
         "org.apache.commons:commons-math3": {
@@ -2977,7 +3705,32 @@
         },
         "org.assertj:assertj-core": {
             "locked": "3.8.0",
-            "requested": "3.8.0"
+            "requested": "3.8.0",
+            "transitive": [
+                "com.netflix.titus:titus-testkit"
+            ]
+        },
+        "org.bouncycastle:bcmail-jdk15on": {
+            "locked": "1.52",
+            "transitive": [
+                "org.mock-server:mockserver-core"
+            ]
+        },
+        "org.bouncycastle:bcpkix-jdk15on": {
+            "locked": "1.52",
+            "transitive": [
+                "org.bouncycastle:bcmail-jdk15on",
+                "org.mock-server:mockserver-core"
+            ]
+        },
+        "org.bouncycastle:bcprov-jdk15on": {
+            "locked": "1.50",
+            "transitive": [
+                "org.bouncycastle:bcmail-jdk15on",
+                "org.bouncycastle:bcpkix-jdk15on",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty"
+            ]
         },
         "org.caffinitas.ohc:ohc-core": {
             "locked": "0.4.3",
@@ -3126,7 +3879,8 @@
             "locked": "20140107",
             "transitive": [
                 "com.netflix.fenzo:fenzo-core",
-                "com.netflix.titus:titus-server-master"
+                "com.netflix.titus:titus-server-master",
+                "org.skyscreamer:jsonassert"
             ]
         },
         "org.mindrot:jbcrypt": {
@@ -3135,11 +3889,42 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "org.mock-server:mockserver-client-java": {
+            "locked": "3.10.4",
+            "transitive": [
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "org.mock-server:mockserver-core": {
+            "locked": "3.10.4",
+            "transitive": [
+                "org.mock-server:mockserver-client-java",
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "org.mock-server:mockserver-logging": {
+            "locked": "3.10.4",
+            "transitive": [
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "org.mock-server:mockserver-netty": {
+            "locked": "3.10.4",
+            "transitive": [
+                "com.netflix.titus:titus-server-runtime"
+            ]
+        },
         "org.mockito:mockito-core": {
-            "locked": "2.21.0",
+            "locked": "2.23.0",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.titus:titus-testkit"
+            ]
+        },
+        "org.mozilla:rhino": {
+            "locked": "1.7R4",
+            "transitive": [
+                "com.github.fge:json-schema-core"
             ]
         },
         "org.objenesis:objenesis": {
@@ -3189,10 +3974,51 @@
                 "com.netflix.fenzo:fenzo-triggers"
             ]
         },
+        "org.reactivestreams:reactive-streams": {
+            "locked": "1.0.2",
+            "transitive": [
+                "com.github.akarnokd:rxjava2-interop",
+                "io.projectreactor:reactor-core",
+                "io.reactivex.rxjava2:rxjava"
+            ]
+        },
         "org.reflections:reflections": {
             "locked": "0.9.10",
             "transitive": [
                 "io.swagger:swagger-jaxrs"
+            ]
+        },
+        "org.scala-lang.modules:scala-parser-combinators_2.11": {
+            "locked": "1.0.4",
+            "transitive": [
+                "com.twitter:util-core_2.11"
+            ]
+        },
+        "org.scala-lang:scala-library": {
+            "locked": "2.11.7",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:finagle-http_2.11",
+                "com.twitter:finagle-native_2.11",
+                "com.twitter:util-app_2.11",
+                "com.twitter:util-cache_2.11",
+                "com.twitter:util-codec_2.11",
+                "com.twitter:util-collection_2.11",
+                "com.twitter:util-core_2.11",
+                "com.twitter:util-function_2.11",
+                "com.twitter:util-hashing_2.11",
+                "com.twitter:util-jvm_2.11",
+                "com.twitter:util-lint_2.11",
+                "com.twitter:util-logging_2.11",
+                "com.twitter:util-registry_2.11",
+                "com.twitter:util-stats_2.11",
+                "org.scala-lang.modules:scala-parser-combinators_2.11"
+            ]
+        },
+        "org.skyscreamer:jsonassert": {
+            "locked": "1.2.3",
+            "transitive": [
+                "org.mock-server:mockserver-core"
             ]
         },
         "org.slf4j:jcl-over-slf4j": {
@@ -3206,6 +4032,7 @@
             "locked": "1.7.25",
             "requested": "1.7.0",
             "transitive": [
+                "ch.qos.logback:logback-classic",
                 "com.addthis.metrics:reporter-config-base",
                 "com.addthis.metrics:reporter-config3",
                 "com.datastax.cassandra:cassandra-driver-core",
@@ -3237,6 +4064,10 @@
                 "org.apache.zookeeper:zookeeper",
                 "org.caffinitas.ohc:ohc-core",
                 "org.cassandraunit:cassandra-unit",
+                "org.mock-server:mockserver-client-java",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-logging",
+                "org.mock-server:mockserver-netty",
                 "org.quartz-scheduler:quartz",
                 "org.slf4j:jcl-over-slf4j",
                 "org.slf4j:slf4j-log4j12"
@@ -3289,6 +4120,18 @@
                 "com.addthis.metrics:reporter-config3",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "xerces:xerces": {
+            "locked": "2.4.0",
+            "transitive": [
+                "org.mock-server:mockserver-core"
+            ]
+        },
+        "xerces:xercesImpl": {
+            "locked": "2.4.0",
+            "transitive": [
+                "xerces:xerces"
             ]
         }
     },
@@ -3311,6 +4154,21 @@
                 "com.jayway.awaitility:awaitility"
             ]
         },
+        "ch.qos.logback:logback-classic": {
+            "locked": "1.1.3",
+            "transitive": [
+                "org.mock-server:mockserver-client-java",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-logging",
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "ch.qos.logback:logback-core": {
+            "locked": "1.1.3",
+            "transitive": [
+                "ch.qos.logback:logback-classic"
+            ]
+        },
         "com.addthis.metrics:reporter-config-base": {
             "locked": "3.0.0",
             "transitive": [
@@ -3360,7 +4218,8 @@
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.fenzo:fenzo-triggers",
                 "io.swagger:swagger-core",
-                "io.swagger:swagger-models"
+                "io.swagger:swagger-models",
+                "org.mock-server:mockserver-core"
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
@@ -3368,17 +4227,20 @@
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
-                "com.fasterxml.jackson.datatype:jackson-datatype-jdk8"
+                "com.fasterxml.jackson.datatype:jackson-datatype-jdk8",
+                "org.mock-server:mockserver-core"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
             "locked": "2.8.7",
             "transitive": [
                 "com.fasterxml.jackson.datatype:jackson-datatype-jdk8",
+                "com.github.fge:jackson-coreutils",
                 "com.netflix.fenzo:fenzo-core",
                 "com.netflix.titus:titus-common",
                 "io.swagger:swagger-core",
-                "io.swagger:swagger-jaxrs"
+                "io.swagger:swagger-jaxrs",
+                "org.mock-server:mockserver-core"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
@@ -3399,11 +4261,54 @@
                 "org.hibernate:hibernate-validator"
             ]
         },
+        "com.github.akarnokd:rxjava2-interop": {
+            "locked": "0.13.2",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
         "com.github.ben-manes.caffeine:caffeine": {
             "locked": "2.6.2",
             "transitive": [
                 "com.netflix.titus:titus-common",
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "com.github.fge:btf": {
+            "locked": "1.2",
+            "transitive": [
+                "com.github.fge:msg-simple"
+            ]
+        },
+        "com.github.fge:jackson-coreutils": {
+            "locked": "1.8",
+            "transitive": [
+                "com.github.fge:json-schema-core"
+            ]
+        },
+        "com.github.fge:json-schema-core": {
+            "locked": "1.2.5",
+            "transitive": [
+                "com.github.fge:json-schema-validator"
+            ]
+        },
+        "com.github.fge:json-schema-validator": {
+            "locked": "2.2.6",
+            "transitive": [
+                "org.mock-server:mockserver-core"
+            ]
+        },
+        "com.github.fge:msg-simple": {
+            "locked": "1.1",
+            "transitive": [
+                "com.github.fge:jackson-coreutils",
+                "com.github.fge:uri-template"
+            ]
+        },
+        "com.github.fge:uri-template": {
+            "locked": "0.9",
+            "transitive": [
+                "com.github.fge:json-schema-core"
             ]
         },
         "com.github.jbellis:jamm": {
@@ -3471,6 +4376,14 @@
         "com.google.code.findbugs:jsr305": {
             "locked": "3.0.0",
             "transitive": [
+                "com.github.fge:btf",
+                "com.github.fge:jackson-coreutils",
+                "com.github.fge:json-schema-core",
+                "com.github.fge:json-schema-validator",
+                "com.github.fge:msg-simple",
+                "com.github.fge:uri-template",
+                "com.twitter:util-cache_2.11",
+                "com.twitter:util-collection_2.11",
                 "io.grpc:grpc-core"
             ]
         },
@@ -3492,9 +4405,15 @@
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.datastax.cassandra:cassandra-driver-extras",
+                "com.github.fge:jackson-coreutils",
+                "com.github.fge:uri-template",
                 "com.google.inject:guice",
                 "com.google.protobuf:protobuf-java-util",
                 "com.netflix.titus:titus-common",
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:finagle-http_2.11",
+                "com.twitter:util-cache_2.11",
+                "com.twitter:util-collection_2.11",
                 "io.grpc:grpc-core",
                 "io.grpc:grpc-protobuf",
                 "io.grpc:grpc-protobuf-lite",
@@ -3505,6 +4424,9 @@
                 "org.apache.curator:curator-client",
                 "org.caffinitas.ohc:ohc-core",
                 "org.cassandraunit:cassandra-unit",
+                "org.mock-server:mockserver-client-java",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty",
                 "org.reflections:reflections"
             ]
         },
@@ -3585,9 +4507,21 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "com.googlecode.libphonenumber:libphonenumber": {
+            "locked": "6.2",
+            "transitive": [
+                "com.github.fge:json-schema-validator"
+            ]
+        },
         "com.jayway.awaitility:awaitility": {
             "locked": "1.7.0",
             "requested": "1.7.0"
+        },
+        "com.jcraft:jzlib": {
+            "locked": "1.1.3",
+            "transitive": [
+                "org.mock-server:mockserver-core"
+            ]
         },
         "com.lmax:disruptor": {
             "locked": "3.0.1",
@@ -3822,6 +4756,119 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "com.twitter:finagle-core_2.11": {
+            "locked": "6.33.0",
+            "transitive": [
+                "com.twitter:finagle-http_2.11",
+                "com.twitter:finagle-native_2.11"
+            ]
+        },
+        "com.twitter:finagle-http_2.11": {
+            "locked": "6.33.0",
+            "transitive": [
+                "com.twitter:finagle-native_2.11"
+            ]
+        },
+        "com.twitter:finagle-native_2.11": {
+            "locked": "6.33.0",
+            "transitive": [
+                "org.mock-server:mockserver-core"
+            ]
+        },
+        "com.twitter:jsr166e": {
+            "locked": "1.0.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-core_2.11"
+            ]
+        },
+        "com.twitter:util-app_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-jvm_2.11",
+                "com.twitter:util-logging_2.11"
+            ]
+        },
+        "com.twitter:util-cache_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11"
+            ]
+        },
+        "com.twitter:util-codec_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:finagle-http_2.11"
+            ]
+        },
+        "com.twitter:util-collection_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11"
+            ]
+        },
+        "com.twitter:util-core_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-app_2.11",
+                "com.twitter:util-cache_2.11",
+                "com.twitter:util-codec_2.11",
+                "com.twitter:util-collection_2.11",
+                "com.twitter:util-jvm_2.11",
+                "com.twitter:util-logging_2.11",
+                "com.twitter:util-registry_2.11",
+                "com.twitter:util-stats_2.11"
+            ]
+        },
+        "com.twitter:util-function_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:util-core_2.11"
+            ]
+        },
+        "com.twitter:util-hashing_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11"
+            ]
+        },
+        "com.twitter:util-jvm_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11"
+            ]
+        },
+        "com.twitter:util-lint_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-stats_2.11"
+            ]
+        },
+        "com.twitter:util-logging_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:finagle-http_2.11"
+            ]
+        },
+        "com.twitter:util-registry_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-app_2.11"
+            ]
+        },
+        "com.twitter:util-stats_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-logging_2.11"
+            ]
+        },
         "commons-cli:commons-cli": {
             "locked": "1.3.1",
             "transitive": [
@@ -3831,9 +4878,29 @@
             ]
         },
         "commons-codec:commons-codec": {
-            "locked": "1.2",
+            "locked": "1.9",
             "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-codec_2.11",
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "commons-collections:commons-collections": {
+            "locked": "3.2.1",
+            "transitive": [
+                "com.twitter:util-collection_2.11"
+            ]
+        },
+        "commons-io:commons-io": {
+            "locked": "1.3.2",
+            "transitive": [
+                "org.apache.commons:commons-io"
+            ]
+        },
+        "commons-lang:commons-lang": {
+            "locked": "2.6",
+            "transitive": [
+                "com.twitter:finagle-http_2.11"
             ]
         },
         "commons-logging:commons-logging": {
@@ -3907,66 +4974,105 @@
             ]
         },
         "io.netty:netty": {
-            "locked": "3.7.0.Final",
+            "locked": "3.10.1.Final",
             "transitive": [
+                "com.twitter:finagle-core_2.11",
                 "org.apache.zookeeper:zookeeper"
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty"
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
-                "io.netty:netty-handler"
+                "io.netty:netty-codec-socks",
+                "io.netty:netty-handler",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
-                "io.reactivex:rxnetty"
+                "io.netty:netty-handler-proxy",
+                "io.projectreactor.ipc:reactor-netty",
+                "io.reactivex:rxnetty",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "io.netty:netty-codec-socks": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.netty:netty-handler-proxy",
+                "org.mock-server:mockserver-core"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common",
+                "org.mock-server:mockserver-netty"
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
+                "io.projectreactor.ipc:reactor-netty",
                 "io.reactivex:rxnetty",
-                "org.cassandraunit:cassandra-unit"
+                "org.cassandraunit:cassandra-unit",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "io.netty:netty-handler-proxy": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.projectreactor.ipc:reactor-netty"
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-handler-proxy",
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty"
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
+                "io.projectreactor.ipc:reactor-netty",
                 "io.reactivex:rxnetty"
+            ]
+        },
+        "io.netty:netty-transport-native-unix-common": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.netty:netty-transport-native-epoll"
             ]
         },
         "io.opencensus:opencensus-api": {
@@ -3982,9 +5088,41 @@
                 "io.grpc:grpc-core"
             ]
         },
+        "io.projectreactor.addons:reactor-adapter": {
+            "locked": "3.1.7.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
+        "io.projectreactor.ipc:reactor-netty": {
+            "locked": "0.7.11.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
+        "io.projectreactor:reactor-core": {
+            "locked": "3.1.11.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common",
+                "io.projectreactor.addons:reactor-adapter",
+                "io.projectreactor.ipc:reactor-netty",
+                "io.projectreactor:reactor-test"
+            ]
+        },
+        "io.projectreactor:reactor-test": {
+            "locked": "3.1.11.RELEASE",
+            "requested": "3.1.+"
+        },
+        "io.reactivex.rxjava2:rxjava": {
+            "locked": "2.2.2",
+            "transitive": [
+                "com.github.akarnokd:rxjava2-interop"
+            ]
+        },
         "io.reactivex:rxjava": {
             "locked": "1.3.8",
             "transitive": [
+                "com.github.akarnokd:rxjava2-interop",
                 "com.netflix.fenzo:fenzo-triggers",
                 "com.netflix.titus:titus-common",
                 "io.reactivex:rxnetty"
@@ -4029,6 +5167,18 @@
                 "com.clearspring.analytics:stream"
             ]
         },
+        "janino:janino": {
+            "locked": "2.5.10",
+            "transitive": [
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "javax.activation:activation": {
+            "locked": "1.1",
+            "transitive": [
+                "javax.mail:mailapi"
+            ]
+        },
         "javax.el:javax.el-api": {
             "locked": "3.0.1-b06",
             "transitive": [
@@ -4046,17 +5196,26 @@
                 "com.netflix.governator:governator-providers",
                 "com.netflix.runtime:health-core",
                 "com.netflix.titus:titus-server-master",
-                "com.sun.jersey.contribs:jersey-guice"
+                "com.sun.jersey.contribs:jersey-guice",
+                "com.twitter:util-collection_2.11"
+            ]
+        },
+        "javax.mail:mailapi": {
+            "locked": "1.4.3",
+            "transitive": [
+                "com.github.fge:json-schema-validator"
             ]
         },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.1.0",
             "transitive": [
+                "com.netflix.titus:titus-common",
                 "com.netflix.titus:titus-server-gateway",
                 "com.netflix.titus:titus-server-master",
                 "com.netflix.titus:titus-server-runtime",
                 "com.netflix.titus:titus-testkit",
-                "org.eclipse.jetty:jetty-server"
+                "org.eclipse.jetty:jetty-server",
+                "org.mock-server:mockserver-core"
             ]
         },
         "javax.validation:validation-api": {
@@ -4069,6 +5228,7 @@
         "javax.ws.rs:jsr311-api": {
             "locked": "1.1.1",
             "transitive": [
+                "com.netflix.titus:titus-common",
                 "com.sun.jersey:jersey-core",
                 "io.swagger:swagger-jaxrs"
             ]
@@ -4082,6 +5242,7 @@
         "joda-time:joda-time": {
             "locked": "2.9.9",
             "transitive": [
+                "com.github.fge:json-schema-validator",
                 "com.netflix.fenzo:fenzo-triggers",
                 "org.apache.cassandra:cassandra-all"
             ]
@@ -4089,7 +5250,8 @@
         "junit:junit": {
             "locked": "4.12",
             "transitive": [
-                "org.cassandraunit:cassandra-unit"
+                "org.cassandraunit:cassandra-unit",
+                "org.mock-server:mockserver-netty"
             ]
         },
         "junit:junit-dep": {
@@ -4107,13 +5269,13 @@
             ]
         },
         "net.bytebuddy:byte-buddy": {
-            "locked": "1.8.15",
+            "locked": "1.9.0",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
         },
         "net.bytebuddy:byte-buddy-agent": {
-            "locked": "1.8.15",
+            "locked": "1.9.0",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -4135,6 +5297,12 @@
             "locked": "1.0",
             "transitive": [
                 "org.apache.cassandra:cassandra-thrift"
+            ]
+        },
+        "net.sf.jopt-simple:jopt-simple": {
+            "locked": "4.6",
+            "transitive": [
+                "com.github.fge:json-schema-validator"
             ]
         },
         "org.antlr:ST4": {
@@ -4169,6 +5337,12 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "org.apache.commons:commons-io": {
+            "locked": "1.3.2",
+            "transitive": [
+                "org.mock-server:mockserver-core"
+            ]
+        },
         "org.apache.commons:commons-lang3": {
             "locked": "3.4",
             "transitive": [
@@ -4178,7 +5352,9 @@
                 "io.swagger:swagger-core",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",
-                "org.cassandraunit:cassandra-unit"
+                "org.cassandraunit:cassandra-unit",
+                "org.mock-server:mockserver-client-java",
+                "org.mock-server:mockserver-core"
             ]
         },
         "org.apache.commons:commons-math3": {
@@ -4229,7 +5405,32 @@
         },
         "org.assertj:assertj-core": {
             "locked": "3.8.0",
-            "requested": "3.8.0"
+            "requested": "3.8.0",
+            "transitive": [
+                "com.netflix.titus:titus-testkit"
+            ]
+        },
+        "org.bouncycastle:bcmail-jdk15on": {
+            "locked": "1.52",
+            "transitive": [
+                "org.mock-server:mockserver-core"
+            ]
+        },
+        "org.bouncycastle:bcpkix-jdk15on": {
+            "locked": "1.52",
+            "transitive": [
+                "org.bouncycastle:bcmail-jdk15on",
+                "org.mock-server:mockserver-core"
+            ]
+        },
+        "org.bouncycastle:bcprov-jdk15on": {
+            "locked": "1.50",
+            "transitive": [
+                "org.bouncycastle:bcmail-jdk15on",
+                "org.bouncycastle:bcpkix-jdk15on",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty"
+            ]
         },
         "org.caffinitas.ohc:ohc-core": {
             "locked": "0.4.3",
@@ -4378,7 +5579,8 @@
             "locked": "20140107",
             "transitive": [
                 "com.netflix.fenzo:fenzo-core",
-                "com.netflix.titus:titus-server-master"
+                "com.netflix.titus:titus-server-master",
+                "org.skyscreamer:jsonassert"
             ]
         },
         "org.mindrot:jbcrypt": {
@@ -4387,11 +5589,42 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "org.mock-server:mockserver-client-java": {
+            "locked": "3.10.4",
+            "transitive": [
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "org.mock-server:mockserver-core": {
+            "locked": "3.10.4",
+            "transitive": [
+                "org.mock-server:mockserver-client-java",
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "org.mock-server:mockserver-logging": {
+            "locked": "3.10.4",
+            "transitive": [
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "org.mock-server:mockserver-netty": {
+            "locked": "3.10.4",
+            "transitive": [
+                "com.netflix.titus:titus-server-runtime"
+            ]
+        },
         "org.mockito:mockito-core": {
-            "locked": "2.21.0",
+            "locked": "2.23.0",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.titus:titus-testkit"
+            ]
+        },
+        "org.mozilla:rhino": {
+            "locked": "1.7R4",
+            "transitive": [
+                "com.github.fge:json-schema-core"
             ]
         },
         "org.objenesis:objenesis": {
@@ -4441,10 +5674,51 @@
                 "com.netflix.fenzo:fenzo-triggers"
             ]
         },
+        "org.reactivestreams:reactive-streams": {
+            "locked": "1.0.2",
+            "transitive": [
+                "com.github.akarnokd:rxjava2-interop",
+                "io.projectreactor:reactor-core",
+                "io.reactivex.rxjava2:rxjava"
+            ]
+        },
         "org.reflections:reflections": {
             "locked": "0.9.10",
             "transitive": [
                 "io.swagger:swagger-jaxrs"
+            ]
+        },
+        "org.scala-lang.modules:scala-parser-combinators_2.11": {
+            "locked": "1.0.4",
+            "transitive": [
+                "com.twitter:util-core_2.11"
+            ]
+        },
+        "org.scala-lang:scala-library": {
+            "locked": "2.11.7",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:finagle-http_2.11",
+                "com.twitter:finagle-native_2.11",
+                "com.twitter:util-app_2.11",
+                "com.twitter:util-cache_2.11",
+                "com.twitter:util-codec_2.11",
+                "com.twitter:util-collection_2.11",
+                "com.twitter:util-core_2.11",
+                "com.twitter:util-function_2.11",
+                "com.twitter:util-hashing_2.11",
+                "com.twitter:util-jvm_2.11",
+                "com.twitter:util-lint_2.11",
+                "com.twitter:util-logging_2.11",
+                "com.twitter:util-registry_2.11",
+                "com.twitter:util-stats_2.11",
+                "org.scala-lang.modules:scala-parser-combinators_2.11"
+            ]
+        },
+        "org.skyscreamer:jsonassert": {
+            "locked": "1.2.3",
+            "transitive": [
+                "org.mock-server:mockserver-core"
             ]
         },
         "org.slf4j:jcl-over-slf4j": {
@@ -4458,6 +5732,7 @@
             "locked": "1.7.25",
             "requested": "1.7.0",
             "transitive": [
+                "ch.qos.logback:logback-classic",
                 "com.addthis.metrics:reporter-config-base",
                 "com.addthis.metrics:reporter-config3",
                 "com.datastax.cassandra:cassandra-driver-core",
@@ -4489,6 +5764,10 @@
                 "org.apache.zookeeper:zookeeper",
                 "org.caffinitas.ohc:ohc-core",
                 "org.cassandraunit:cassandra-unit",
+                "org.mock-server:mockserver-client-java",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-logging",
+                "org.mock-server:mockserver-netty",
                 "org.quartz-scheduler:quartz",
                 "org.slf4j:jcl-over-slf4j",
                 "org.slf4j:slf4j-log4j12"
@@ -4541,6 +5820,18 @@
                 "com.addthis.metrics:reporter-config3",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "xerces:xerces": {
+            "locked": "2.4.0",
+            "transitive": [
+                "org.mock-server:mockserver-core"
+            ]
+        },
+        "xerces:xercesImpl": {
+            "locked": "2.4.0",
+            "transitive": [
+                "xerces:xerces"
             ]
         }
     },
@@ -4563,6 +5854,21 @@
                 "com.jayway.awaitility:awaitility"
             ]
         },
+        "ch.qos.logback:logback-classic": {
+            "locked": "1.1.3",
+            "transitive": [
+                "org.mock-server:mockserver-client-java",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-logging",
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "ch.qos.logback:logback-core": {
+            "locked": "1.1.3",
+            "transitive": [
+                "ch.qos.logback:logback-classic"
+            ]
+        },
         "com.addthis.metrics:reporter-config-base": {
             "locked": "3.0.0",
             "transitive": [
@@ -4612,7 +5918,8 @@
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.fenzo:fenzo-triggers",
                 "io.swagger:swagger-core",
-                "io.swagger:swagger-models"
+                "io.swagger:swagger-models",
+                "org.mock-server:mockserver-core"
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
@@ -4620,17 +5927,20 @@
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
-                "com.fasterxml.jackson.datatype:jackson-datatype-jdk8"
+                "com.fasterxml.jackson.datatype:jackson-datatype-jdk8",
+                "org.mock-server:mockserver-core"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
             "locked": "2.8.7",
             "transitive": [
                 "com.fasterxml.jackson.datatype:jackson-datatype-jdk8",
+                "com.github.fge:jackson-coreutils",
                 "com.netflix.fenzo:fenzo-core",
                 "com.netflix.titus:titus-common",
                 "io.swagger:swagger-core",
-                "io.swagger:swagger-jaxrs"
+                "io.swagger:swagger-jaxrs",
+                "org.mock-server:mockserver-core"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
@@ -4651,11 +5961,54 @@
                 "org.hibernate:hibernate-validator"
             ]
         },
+        "com.github.akarnokd:rxjava2-interop": {
+            "locked": "0.13.2",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
         "com.github.ben-manes.caffeine:caffeine": {
             "locked": "2.6.2",
             "transitive": [
                 "com.netflix.titus:titus-common",
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "com.github.fge:btf": {
+            "locked": "1.2",
+            "transitive": [
+                "com.github.fge:msg-simple"
+            ]
+        },
+        "com.github.fge:jackson-coreutils": {
+            "locked": "1.8",
+            "transitive": [
+                "com.github.fge:json-schema-core"
+            ]
+        },
+        "com.github.fge:json-schema-core": {
+            "locked": "1.2.5",
+            "transitive": [
+                "com.github.fge:json-schema-validator"
+            ]
+        },
+        "com.github.fge:json-schema-validator": {
+            "locked": "2.2.6",
+            "transitive": [
+                "org.mock-server:mockserver-core"
+            ]
+        },
+        "com.github.fge:msg-simple": {
+            "locked": "1.1",
+            "transitive": [
+                "com.github.fge:jackson-coreutils",
+                "com.github.fge:uri-template"
+            ]
+        },
+        "com.github.fge:uri-template": {
+            "locked": "0.9",
+            "transitive": [
+                "com.github.fge:json-schema-core"
             ]
         },
         "com.github.jbellis:jamm": {
@@ -4723,6 +6076,14 @@
         "com.google.code.findbugs:jsr305": {
             "locked": "3.0.0",
             "transitive": [
+                "com.github.fge:btf",
+                "com.github.fge:jackson-coreutils",
+                "com.github.fge:json-schema-core",
+                "com.github.fge:json-schema-validator",
+                "com.github.fge:msg-simple",
+                "com.github.fge:uri-template",
+                "com.twitter:util-cache_2.11",
+                "com.twitter:util-collection_2.11",
                 "io.grpc:grpc-core"
             ]
         },
@@ -4744,9 +6105,15 @@
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.datastax.cassandra:cassandra-driver-extras",
+                "com.github.fge:jackson-coreutils",
+                "com.github.fge:uri-template",
                 "com.google.inject:guice",
                 "com.google.protobuf:protobuf-java-util",
                 "com.netflix.titus:titus-common",
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:finagle-http_2.11",
+                "com.twitter:util-cache_2.11",
+                "com.twitter:util-collection_2.11",
                 "io.grpc:grpc-core",
                 "io.grpc:grpc-protobuf",
                 "io.grpc:grpc-protobuf-lite",
@@ -4757,6 +6124,9 @@
                 "org.apache.curator:curator-client",
                 "org.caffinitas.ohc:ohc-core",
                 "org.cassandraunit:cassandra-unit",
+                "org.mock-server:mockserver-client-java",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty",
                 "org.reflections:reflections"
             ]
         },
@@ -4837,9 +6207,21 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "com.googlecode.libphonenumber:libphonenumber": {
+            "locked": "6.2",
+            "transitive": [
+                "com.github.fge:json-schema-validator"
+            ]
+        },
         "com.jayway.awaitility:awaitility": {
             "locked": "1.7.0",
             "requested": "1.7.0"
+        },
+        "com.jcraft:jzlib": {
+            "locked": "1.1.3",
+            "transitive": [
+                "org.mock-server:mockserver-core"
+            ]
         },
         "com.lmax:disruptor": {
             "locked": "3.0.1",
@@ -5074,6 +6456,119 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "com.twitter:finagle-core_2.11": {
+            "locked": "6.33.0",
+            "transitive": [
+                "com.twitter:finagle-http_2.11",
+                "com.twitter:finagle-native_2.11"
+            ]
+        },
+        "com.twitter:finagle-http_2.11": {
+            "locked": "6.33.0",
+            "transitive": [
+                "com.twitter:finagle-native_2.11"
+            ]
+        },
+        "com.twitter:finagle-native_2.11": {
+            "locked": "6.33.0",
+            "transitive": [
+                "org.mock-server:mockserver-core"
+            ]
+        },
+        "com.twitter:jsr166e": {
+            "locked": "1.0.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-core_2.11"
+            ]
+        },
+        "com.twitter:util-app_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-jvm_2.11",
+                "com.twitter:util-logging_2.11"
+            ]
+        },
+        "com.twitter:util-cache_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11"
+            ]
+        },
+        "com.twitter:util-codec_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:finagle-http_2.11"
+            ]
+        },
+        "com.twitter:util-collection_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11"
+            ]
+        },
+        "com.twitter:util-core_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-app_2.11",
+                "com.twitter:util-cache_2.11",
+                "com.twitter:util-codec_2.11",
+                "com.twitter:util-collection_2.11",
+                "com.twitter:util-jvm_2.11",
+                "com.twitter:util-logging_2.11",
+                "com.twitter:util-registry_2.11",
+                "com.twitter:util-stats_2.11"
+            ]
+        },
+        "com.twitter:util-function_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:util-core_2.11"
+            ]
+        },
+        "com.twitter:util-hashing_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11"
+            ]
+        },
+        "com.twitter:util-jvm_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11"
+            ]
+        },
+        "com.twitter:util-lint_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-stats_2.11"
+            ]
+        },
+        "com.twitter:util-logging_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:finagle-http_2.11"
+            ]
+        },
+        "com.twitter:util-registry_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-app_2.11"
+            ]
+        },
+        "com.twitter:util-stats_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-logging_2.11"
+            ]
+        },
         "commons-cli:commons-cli": {
             "locked": "1.3.1",
             "transitive": [
@@ -5083,9 +6578,29 @@
             ]
         },
         "commons-codec:commons-codec": {
-            "locked": "1.2",
+            "locked": "1.9",
             "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-codec_2.11",
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "commons-collections:commons-collections": {
+            "locked": "3.2.1",
+            "transitive": [
+                "com.twitter:util-collection_2.11"
+            ]
+        },
+        "commons-io:commons-io": {
+            "locked": "1.3.2",
+            "transitive": [
+                "org.apache.commons:commons-io"
+            ]
+        },
+        "commons-lang:commons-lang": {
+            "locked": "2.6",
+            "transitive": [
+                "com.twitter:finagle-http_2.11"
             ]
         },
         "commons-logging:commons-logging": {
@@ -5159,66 +6674,105 @@
             ]
         },
         "io.netty:netty": {
-            "locked": "3.7.0.Final",
+            "locked": "3.10.1.Final",
             "transitive": [
+                "com.twitter:finagle-core_2.11",
                 "org.apache.zookeeper:zookeeper"
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty"
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
-                "io.netty:netty-handler"
+                "io.netty:netty-codec-socks",
+                "io.netty:netty-handler",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
-                "io.reactivex:rxnetty"
+                "io.netty:netty-handler-proxy",
+                "io.projectreactor.ipc:reactor-netty",
+                "io.reactivex:rxnetty",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "io.netty:netty-codec-socks": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.netty:netty-handler-proxy",
+                "org.mock-server:mockserver-core"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common",
+                "org.mock-server:mockserver-netty"
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
+                "io.projectreactor.ipc:reactor-netty",
                 "io.reactivex:rxnetty",
-                "org.cassandraunit:cassandra-unit"
+                "org.cassandraunit:cassandra-unit",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "io.netty:netty-handler-proxy": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.projectreactor.ipc:reactor-netty"
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-handler-proxy",
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty"
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
+                "io.projectreactor.ipc:reactor-netty",
                 "io.reactivex:rxnetty"
+            ]
+        },
+        "io.netty:netty-transport-native-unix-common": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.netty:netty-transport-native-epoll"
             ]
         },
         "io.opencensus:opencensus-api": {
@@ -5234,9 +6788,41 @@
                 "io.grpc:grpc-core"
             ]
         },
+        "io.projectreactor.addons:reactor-adapter": {
+            "locked": "3.1.7.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
+        "io.projectreactor.ipc:reactor-netty": {
+            "locked": "0.7.11.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
+        "io.projectreactor:reactor-core": {
+            "locked": "3.1.11.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common",
+                "io.projectreactor.addons:reactor-adapter",
+                "io.projectreactor.ipc:reactor-netty",
+                "io.projectreactor:reactor-test"
+            ]
+        },
+        "io.projectreactor:reactor-test": {
+            "locked": "3.1.11.RELEASE",
+            "requested": "3.1.+"
+        },
+        "io.reactivex.rxjava2:rxjava": {
+            "locked": "2.2.2",
+            "transitive": [
+                "com.github.akarnokd:rxjava2-interop"
+            ]
+        },
         "io.reactivex:rxjava": {
             "locked": "1.3.8",
             "transitive": [
+                "com.github.akarnokd:rxjava2-interop",
                 "com.netflix.fenzo:fenzo-triggers",
                 "com.netflix.titus:titus-common",
                 "io.reactivex:rxnetty"
@@ -5281,6 +6867,18 @@
                 "com.clearspring.analytics:stream"
             ]
         },
+        "janino:janino": {
+            "locked": "2.5.10",
+            "transitive": [
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "javax.activation:activation": {
+            "locked": "1.1",
+            "transitive": [
+                "javax.mail:mailapi"
+            ]
+        },
         "javax.el:javax.el-api": {
             "locked": "3.0.1-b06",
             "transitive": [
@@ -5298,17 +6896,26 @@
                 "com.netflix.governator:governator-providers",
                 "com.netflix.runtime:health-core",
                 "com.netflix.titus:titus-server-master",
-                "com.sun.jersey.contribs:jersey-guice"
+                "com.sun.jersey.contribs:jersey-guice",
+                "com.twitter:util-collection_2.11"
+            ]
+        },
+        "javax.mail:mailapi": {
+            "locked": "1.4.3",
+            "transitive": [
+                "com.github.fge:json-schema-validator"
             ]
         },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.1.0",
             "transitive": [
+                "com.netflix.titus:titus-common",
                 "com.netflix.titus:titus-server-gateway",
                 "com.netflix.titus:titus-server-master",
                 "com.netflix.titus:titus-server-runtime",
                 "com.netflix.titus:titus-testkit",
-                "org.eclipse.jetty:jetty-server"
+                "org.eclipse.jetty:jetty-server",
+                "org.mock-server:mockserver-core"
             ]
         },
         "javax.validation:validation-api": {
@@ -5321,6 +6928,7 @@
         "javax.ws.rs:jsr311-api": {
             "locked": "1.1.1",
             "transitive": [
+                "com.netflix.titus:titus-common",
                 "com.sun.jersey:jersey-core",
                 "io.swagger:swagger-jaxrs"
             ]
@@ -5334,6 +6942,7 @@
         "joda-time:joda-time": {
             "locked": "2.9.9",
             "transitive": [
+                "com.github.fge:json-schema-validator",
                 "com.netflix.fenzo:fenzo-triggers",
                 "org.apache.cassandra:cassandra-all"
             ]
@@ -5341,7 +6950,8 @@
         "junit:junit": {
             "locked": "4.12",
             "transitive": [
-                "org.cassandraunit:cassandra-unit"
+                "org.cassandraunit:cassandra-unit",
+                "org.mock-server:mockserver-netty"
             ]
         },
         "junit:junit-dep": {
@@ -5359,13 +6969,13 @@
             ]
         },
         "net.bytebuddy:byte-buddy": {
-            "locked": "1.8.15",
+            "locked": "1.9.0",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
         },
         "net.bytebuddy:byte-buddy-agent": {
-            "locked": "1.8.15",
+            "locked": "1.9.0",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -5387,6 +6997,12 @@
             "locked": "1.0",
             "transitive": [
                 "org.apache.cassandra:cassandra-thrift"
+            ]
+        },
+        "net.sf.jopt-simple:jopt-simple": {
+            "locked": "4.6",
+            "transitive": [
+                "com.github.fge:json-schema-validator"
             ]
         },
         "org.antlr:ST4": {
@@ -5421,6 +7037,12 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "org.apache.commons:commons-io": {
+            "locked": "1.3.2",
+            "transitive": [
+                "org.mock-server:mockserver-core"
+            ]
+        },
         "org.apache.commons:commons-lang3": {
             "locked": "3.4",
             "transitive": [
@@ -5430,7 +7052,9 @@
                 "io.swagger:swagger-core",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",
-                "org.cassandraunit:cassandra-unit"
+                "org.cassandraunit:cassandra-unit",
+                "org.mock-server:mockserver-client-java",
+                "org.mock-server:mockserver-core"
             ]
         },
         "org.apache.commons:commons-math3": {
@@ -5481,7 +7105,32 @@
         },
         "org.assertj:assertj-core": {
             "locked": "3.8.0",
-            "requested": "3.8.0"
+            "requested": "3.8.0",
+            "transitive": [
+                "com.netflix.titus:titus-testkit"
+            ]
+        },
+        "org.bouncycastle:bcmail-jdk15on": {
+            "locked": "1.52",
+            "transitive": [
+                "org.mock-server:mockserver-core"
+            ]
+        },
+        "org.bouncycastle:bcpkix-jdk15on": {
+            "locked": "1.52",
+            "transitive": [
+                "org.bouncycastle:bcmail-jdk15on",
+                "org.mock-server:mockserver-core"
+            ]
+        },
+        "org.bouncycastle:bcprov-jdk15on": {
+            "locked": "1.50",
+            "transitive": [
+                "org.bouncycastle:bcmail-jdk15on",
+                "org.bouncycastle:bcpkix-jdk15on",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty"
+            ]
         },
         "org.caffinitas.ohc:ohc-core": {
             "locked": "0.4.3",
@@ -5630,7 +7279,8 @@
             "locked": "20140107",
             "transitive": [
                 "com.netflix.fenzo:fenzo-core",
-                "com.netflix.titus:titus-server-master"
+                "com.netflix.titus:titus-server-master",
+                "org.skyscreamer:jsonassert"
             ]
         },
         "org.mindrot:jbcrypt": {
@@ -5639,11 +7289,42 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "org.mock-server:mockserver-client-java": {
+            "locked": "3.10.4",
+            "transitive": [
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "org.mock-server:mockserver-core": {
+            "locked": "3.10.4",
+            "transitive": [
+                "org.mock-server:mockserver-client-java",
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "org.mock-server:mockserver-logging": {
+            "locked": "3.10.4",
+            "transitive": [
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "org.mock-server:mockserver-netty": {
+            "locked": "3.10.4",
+            "transitive": [
+                "com.netflix.titus:titus-server-runtime"
+            ]
+        },
         "org.mockito:mockito-core": {
-            "locked": "2.21.0",
+            "locked": "2.23.0",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.titus:titus-testkit"
+            ]
+        },
+        "org.mozilla:rhino": {
+            "locked": "1.7R4",
+            "transitive": [
+                "com.github.fge:json-schema-core"
             ]
         },
         "org.objenesis:objenesis": {
@@ -5693,10 +7374,51 @@
                 "com.netflix.fenzo:fenzo-triggers"
             ]
         },
+        "org.reactivestreams:reactive-streams": {
+            "locked": "1.0.2",
+            "transitive": [
+                "com.github.akarnokd:rxjava2-interop",
+                "io.projectreactor:reactor-core",
+                "io.reactivex.rxjava2:rxjava"
+            ]
+        },
         "org.reflections:reflections": {
             "locked": "0.9.10",
             "transitive": [
                 "io.swagger:swagger-jaxrs"
+            ]
+        },
+        "org.scala-lang.modules:scala-parser-combinators_2.11": {
+            "locked": "1.0.4",
+            "transitive": [
+                "com.twitter:util-core_2.11"
+            ]
+        },
+        "org.scala-lang:scala-library": {
+            "locked": "2.11.7",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:finagle-http_2.11",
+                "com.twitter:finagle-native_2.11",
+                "com.twitter:util-app_2.11",
+                "com.twitter:util-cache_2.11",
+                "com.twitter:util-codec_2.11",
+                "com.twitter:util-collection_2.11",
+                "com.twitter:util-core_2.11",
+                "com.twitter:util-function_2.11",
+                "com.twitter:util-hashing_2.11",
+                "com.twitter:util-jvm_2.11",
+                "com.twitter:util-lint_2.11",
+                "com.twitter:util-logging_2.11",
+                "com.twitter:util-registry_2.11",
+                "com.twitter:util-stats_2.11",
+                "org.scala-lang.modules:scala-parser-combinators_2.11"
+            ]
+        },
+        "org.skyscreamer:jsonassert": {
+            "locked": "1.2.3",
+            "transitive": [
+                "org.mock-server:mockserver-core"
             ]
         },
         "org.slf4j:jcl-over-slf4j": {
@@ -5710,6 +7432,7 @@
             "locked": "1.7.25",
             "requested": "1.7.0",
             "transitive": [
+                "ch.qos.logback:logback-classic",
                 "com.addthis.metrics:reporter-config-base",
                 "com.addthis.metrics:reporter-config3",
                 "com.datastax.cassandra:cassandra-driver-core",
@@ -5741,6 +7464,10 @@
                 "org.apache.zookeeper:zookeeper",
                 "org.caffinitas.ohc:ohc-core",
                 "org.cassandraunit:cassandra-unit",
+                "org.mock-server:mockserver-client-java",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-logging",
+                "org.mock-server:mockserver-netty",
                 "org.quartz-scheduler:quartz",
                 "org.slf4j:jcl-over-slf4j",
                 "org.slf4j:slf4j-log4j12"
@@ -5794,6 +7521,18 @@
                 "com.addthis.metrics:reporter-config3",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "xerces:xerces": {
+            "locked": "2.4.0",
+            "transitive": [
+                "org.mock-server:mockserver-core"
+            ]
+        },
+        "xerces:xercesImpl": {
+            "locked": "2.4.0",
+            "transitive": [
+                "xerces:xerces"
             ]
         }
     },
@@ -5816,6 +7555,21 @@
                 "com.jayway.awaitility:awaitility"
             ]
         },
+        "ch.qos.logback:logback-classic": {
+            "locked": "1.1.3",
+            "transitive": [
+                "org.mock-server:mockserver-client-java",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-logging",
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "ch.qos.logback:logback-core": {
+            "locked": "1.1.3",
+            "transitive": [
+                "ch.qos.logback:logback-classic"
+            ]
+        },
         "com.addthis.metrics:reporter-config-base": {
             "locked": "3.0.0",
             "transitive": [
@@ -5865,7 +7619,8 @@
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.netflix.fenzo:fenzo-triggers",
                 "io.swagger:swagger-core",
-                "io.swagger:swagger-models"
+                "io.swagger:swagger-models",
+                "org.mock-server:mockserver-core"
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
@@ -5873,17 +7628,20 @@
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
-                "com.fasterxml.jackson.datatype:jackson-datatype-jdk8"
+                "com.fasterxml.jackson.datatype:jackson-datatype-jdk8",
+                "org.mock-server:mockserver-core"
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
             "locked": "2.8.7",
             "transitive": [
                 "com.fasterxml.jackson.datatype:jackson-datatype-jdk8",
+                "com.github.fge:jackson-coreutils",
                 "com.netflix.fenzo:fenzo-core",
                 "com.netflix.titus:titus-common",
                 "io.swagger:swagger-core",
-                "io.swagger:swagger-jaxrs"
+                "io.swagger:swagger-jaxrs",
+                "org.mock-server:mockserver-core"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
@@ -5904,11 +7662,54 @@
                 "org.hibernate:hibernate-validator"
             ]
         },
+        "com.github.akarnokd:rxjava2-interop": {
+            "locked": "0.13.2",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
         "com.github.ben-manes.caffeine:caffeine": {
             "locked": "2.6.2",
             "transitive": [
                 "com.netflix.titus:titus-common",
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "com.github.fge:btf": {
+            "locked": "1.2",
+            "transitive": [
+                "com.github.fge:msg-simple"
+            ]
+        },
+        "com.github.fge:jackson-coreutils": {
+            "locked": "1.8",
+            "transitive": [
+                "com.github.fge:json-schema-core"
+            ]
+        },
+        "com.github.fge:json-schema-core": {
+            "locked": "1.2.5",
+            "transitive": [
+                "com.github.fge:json-schema-validator"
+            ]
+        },
+        "com.github.fge:json-schema-validator": {
+            "locked": "2.2.6",
+            "transitive": [
+                "org.mock-server:mockserver-core"
+            ]
+        },
+        "com.github.fge:msg-simple": {
+            "locked": "1.1",
+            "transitive": [
+                "com.github.fge:jackson-coreutils",
+                "com.github.fge:uri-template"
+            ]
+        },
+        "com.github.fge:uri-template": {
+            "locked": "0.9",
+            "transitive": [
+                "com.github.fge:json-schema-core"
             ]
         },
         "com.github.jbellis:jamm": {
@@ -5976,6 +7777,14 @@
         "com.google.code.findbugs:jsr305": {
             "locked": "3.0.0",
             "transitive": [
+                "com.github.fge:btf",
+                "com.github.fge:jackson-coreutils",
+                "com.github.fge:json-schema-core",
+                "com.github.fge:json-schema-validator",
+                "com.github.fge:msg-simple",
+                "com.github.fge:uri-template",
+                "com.twitter:util-cache_2.11",
+                "com.twitter:util-collection_2.11",
                 "io.grpc:grpc-core"
             ]
         },
@@ -5997,9 +7806,15 @@
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.datastax.cassandra:cassandra-driver-extras",
+                "com.github.fge:jackson-coreutils",
+                "com.github.fge:uri-template",
                 "com.google.inject:guice",
                 "com.google.protobuf:protobuf-java-util",
                 "com.netflix.titus:titus-common",
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:finagle-http_2.11",
+                "com.twitter:util-cache_2.11",
+                "com.twitter:util-collection_2.11",
                 "io.grpc:grpc-core",
                 "io.grpc:grpc-protobuf",
                 "io.grpc:grpc-protobuf-lite",
@@ -6010,6 +7825,9 @@
                 "org.apache.curator:curator-client",
                 "org.caffinitas.ohc:ohc-core",
                 "org.cassandraunit:cassandra-unit",
+                "org.mock-server:mockserver-client-java",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty",
                 "org.reflections:reflections"
             ]
         },
@@ -6090,9 +7908,21 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "com.googlecode.libphonenumber:libphonenumber": {
+            "locked": "6.2",
+            "transitive": [
+                "com.github.fge:json-schema-validator"
+            ]
+        },
         "com.jayway.awaitility:awaitility": {
             "locked": "1.7.0",
             "requested": "1.7.0"
+        },
+        "com.jcraft:jzlib": {
+            "locked": "1.1.3",
+            "transitive": [
+                "org.mock-server:mockserver-core"
+            ]
         },
         "com.lmax:disruptor": {
             "locked": "3.0.1",
@@ -6327,6 +8157,119 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "com.twitter:finagle-core_2.11": {
+            "locked": "6.33.0",
+            "transitive": [
+                "com.twitter:finagle-http_2.11",
+                "com.twitter:finagle-native_2.11"
+            ]
+        },
+        "com.twitter:finagle-http_2.11": {
+            "locked": "6.33.0",
+            "transitive": [
+                "com.twitter:finagle-native_2.11"
+            ]
+        },
+        "com.twitter:finagle-native_2.11": {
+            "locked": "6.33.0",
+            "transitive": [
+                "org.mock-server:mockserver-core"
+            ]
+        },
+        "com.twitter:jsr166e": {
+            "locked": "1.0.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-core_2.11"
+            ]
+        },
+        "com.twitter:util-app_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-jvm_2.11",
+                "com.twitter:util-logging_2.11"
+            ]
+        },
+        "com.twitter:util-cache_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11"
+            ]
+        },
+        "com.twitter:util-codec_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:finagle-http_2.11"
+            ]
+        },
+        "com.twitter:util-collection_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11"
+            ]
+        },
+        "com.twitter:util-core_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-app_2.11",
+                "com.twitter:util-cache_2.11",
+                "com.twitter:util-codec_2.11",
+                "com.twitter:util-collection_2.11",
+                "com.twitter:util-jvm_2.11",
+                "com.twitter:util-logging_2.11",
+                "com.twitter:util-registry_2.11",
+                "com.twitter:util-stats_2.11"
+            ]
+        },
+        "com.twitter:util-function_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:util-core_2.11"
+            ]
+        },
+        "com.twitter:util-hashing_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11"
+            ]
+        },
+        "com.twitter:util-jvm_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11"
+            ]
+        },
+        "com.twitter:util-lint_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-stats_2.11"
+            ]
+        },
+        "com.twitter:util-logging_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:finagle-http_2.11"
+            ]
+        },
+        "com.twitter:util-registry_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-app_2.11"
+            ]
+        },
+        "com.twitter:util-stats_2.11": {
+            "locked": "6.32.0",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-logging_2.11"
+            ]
+        },
         "commons-cli:commons-cli": {
             "locked": "1.3.1",
             "transitive": [
@@ -6336,9 +8279,29 @@
             ]
         },
         "commons-codec:commons-codec": {
-            "locked": "1.2",
+            "locked": "1.9",
             "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:util-codec_2.11",
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "commons-collections:commons-collections": {
+            "locked": "3.2.1",
+            "transitive": [
+                "com.twitter:util-collection_2.11"
+            ]
+        },
+        "commons-io:commons-io": {
+            "locked": "1.3.2",
+            "transitive": [
+                "org.apache.commons:commons-io"
+            ]
+        },
+        "commons-lang:commons-lang": {
+            "locked": "2.6",
+            "transitive": [
+                "com.twitter:finagle-http_2.11"
             ]
         },
         "commons-logging:commons-logging": {
@@ -6412,66 +8375,105 @@
             ]
         },
         "io.netty:netty": {
-            "locked": "3.7.0.Final",
+            "locked": "3.10.1.Final",
             "transitive": [
+                "com.twitter:finagle-core_2.11",
                 "org.apache.zookeeper:zookeeper"
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty"
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
-                "io.netty:netty-handler"
+                "io.netty:netty-codec-socks",
+                "io.netty:netty-handler",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
-                "io.reactivex:rxnetty"
+                "io.netty:netty-handler-proxy",
+                "io.projectreactor.ipc:reactor-netty",
+                "io.reactivex:rxnetty",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "io.netty:netty-codec-socks": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.netty:netty-handler-proxy",
+                "org.mock-server:mockserver-core"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common",
+                "org.mock-server:mockserver-netty"
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
+                "io.projectreactor.ipc:reactor-netty",
                 "io.reactivex:rxnetty",
-                "org.cassandraunit:cassandra-unit"
+                "org.cassandraunit:cassandra-unit",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "io.netty:netty-handler-proxy": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.projectreactor.ipc:reactor-netty"
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-handler-proxy",
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty"
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.5.Final",
+            "locked": "4.1.30.Final",
             "transitive": [
+                "io.projectreactor.ipc:reactor-netty",
                 "io.reactivex:rxnetty"
+            ]
+        },
+        "io.netty:netty-transport-native-unix-common": {
+            "locked": "4.1.30.Final",
+            "transitive": [
+                "io.netty:netty-transport-native-epoll"
             ]
         },
         "io.opencensus:opencensus-api": {
@@ -6487,9 +8489,41 @@
                 "io.grpc:grpc-core"
             ]
         },
+        "io.projectreactor.addons:reactor-adapter": {
+            "locked": "3.1.7.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
+        "io.projectreactor.ipc:reactor-netty": {
+            "locked": "0.7.11.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common"
+            ]
+        },
+        "io.projectreactor:reactor-core": {
+            "locked": "3.1.11.RELEASE",
+            "transitive": [
+                "com.netflix.titus:titus-common",
+                "io.projectreactor.addons:reactor-adapter",
+                "io.projectreactor.ipc:reactor-netty",
+                "io.projectreactor:reactor-test"
+            ]
+        },
+        "io.projectreactor:reactor-test": {
+            "locked": "3.1.11.RELEASE",
+            "requested": "3.1.+"
+        },
+        "io.reactivex.rxjava2:rxjava": {
+            "locked": "2.2.2",
+            "transitive": [
+                "com.github.akarnokd:rxjava2-interop"
+            ]
+        },
         "io.reactivex:rxjava": {
             "locked": "1.3.8",
             "transitive": [
+                "com.github.akarnokd:rxjava2-interop",
                 "com.netflix.fenzo:fenzo-triggers",
                 "com.netflix.titus:titus-common",
                 "io.reactivex:rxnetty"
@@ -6534,6 +8568,18 @@
                 "com.clearspring.analytics:stream"
             ]
         },
+        "janino:janino": {
+            "locked": "2.5.10",
+            "transitive": [
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "javax.activation:activation": {
+            "locked": "1.1",
+            "transitive": [
+                "javax.mail:mailapi"
+            ]
+        },
         "javax.el:javax.el-api": {
             "locked": "3.0.1-b06",
             "transitive": [
@@ -6551,17 +8597,26 @@
                 "com.netflix.governator:governator-providers",
                 "com.netflix.runtime:health-core",
                 "com.netflix.titus:titus-server-master",
-                "com.sun.jersey.contribs:jersey-guice"
+                "com.sun.jersey.contribs:jersey-guice",
+                "com.twitter:util-collection_2.11"
+            ]
+        },
+        "javax.mail:mailapi": {
+            "locked": "1.4.3",
+            "transitive": [
+                "com.github.fge:json-schema-validator"
             ]
         },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.1.0",
             "transitive": [
+                "com.netflix.titus:titus-common",
                 "com.netflix.titus:titus-server-gateway",
                 "com.netflix.titus:titus-server-master",
                 "com.netflix.titus:titus-server-runtime",
                 "com.netflix.titus:titus-testkit",
-                "org.eclipse.jetty:jetty-server"
+                "org.eclipse.jetty:jetty-server",
+                "org.mock-server:mockserver-core"
             ]
         },
         "javax.validation:validation-api": {
@@ -6574,6 +8629,7 @@
         "javax.ws.rs:jsr311-api": {
             "locked": "1.1.1",
             "transitive": [
+                "com.netflix.titus:titus-common",
                 "com.sun.jersey:jersey-core",
                 "io.swagger:swagger-jaxrs"
             ]
@@ -6587,6 +8643,7 @@
         "joda-time:joda-time": {
             "locked": "2.9.9",
             "transitive": [
+                "com.github.fge:json-schema-validator",
                 "com.netflix.fenzo:fenzo-triggers",
                 "org.apache.cassandra:cassandra-all"
             ]
@@ -6594,7 +8651,8 @@
         "junit:junit": {
             "locked": "4.12",
             "transitive": [
-                "org.cassandraunit:cassandra-unit"
+                "org.cassandraunit:cassandra-unit",
+                "org.mock-server:mockserver-netty"
             ]
         },
         "junit:junit-dep": {
@@ -6612,13 +8670,13 @@
             ]
         },
         "net.bytebuddy:byte-buddy": {
-            "locked": "1.8.15",
+            "locked": "1.9.0",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
         },
         "net.bytebuddy:byte-buddy-agent": {
-            "locked": "1.8.15",
+            "locked": "1.9.0",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -6640,6 +8698,12 @@
             "locked": "1.0",
             "transitive": [
                 "org.apache.cassandra:cassandra-thrift"
+            ]
+        },
+        "net.sf.jopt-simple:jopt-simple": {
+            "locked": "4.6",
+            "transitive": [
+                "com.github.fge:json-schema-validator"
             ]
         },
         "org.antlr:ST4": {
@@ -6674,6 +8738,12 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "org.apache.commons:commons-io": {
+            "locked": "1.3.2",
+            "transitive": [
+                "org.mock-server:mockserver-core"
+            ]
+        },
         "org.apache.commons:commons-lang3": {
             "locked": "3.4",
             "transitive": [
@@ -6683,7 +8753,9 @@
                 "io.swagger:swagger-core",
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",
-                "org.cassandraunit:cassandra-unit"
+                "org.cassandraunit:cassandra-unit",
+                "org.mock-server:mockserver-client-java",
+                "org.mock-server:mockserver-core"
             ]
         },
         "org.apache.commons:commons-math3": {
@@ -6734,7 +8806,32 @@
         },
         "org.assertj:assertj-core": {
             "locked": "3.8.0",
-            "requested": "3.8.0"
+            "requested": "3.8.0",
+            "transitive": [
+                "com.netflix.titus:titus-testkit"
+            ]
+        },
+        "org.bouncycastle:bcmail-jdk15on": {
+            "locked": "1.52",
+            "transitive": [
+                "org.mock-server:mockserver-core"
+            ]
+        },
+        "org.bouncycastle:bcpkix-jdk15on": {
+            "locked": "1.52",
+            "transitive": [
+                "org.bouncycastle:bcmail-jdk15on",
+                "org.mock-server:mockserver-core"
+            ]
+        },
+        "org.bouncycastle:bcprov-jdk15on": {
+            "locked": "1.50",
+            "transitive": [
+                "org.bouncycastle:bcmail-jdk15on",
+                "org.bouncycastle:bcpkix-jdk15on",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-netty"
+            ]
         },
         "org.caffinitas.ohc:ohc-core": {
             "locked": "0.4.3",
@@ -6883,7 +8980,8 @@
             "locked": "20140107",
             "transitive": [
                 "com.netflix.fenzo:fenzo-core",
-                "com.netflix.titus:titus-server-master"
+                "com.netflix.titus:titus-server-master",
+                "org.skyscreamer:jsonassert"
             ]
         },
         "org.mindrot:jbcrypt": {
@@ -6892,11 +8990,42 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "org.mock-server:mockserver-client-java": {
+            "locked": "3.10.4",
+            "transitive": [
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "org.mock-server:mockserver-core": {
+            "locked": "3.10.4",
+            "transitive": [
+                "org.mock-server:mockserver-client-java",
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "org.mock-server:mockserver-logging": {
+            "locked": "3.10.4",
+            "transitive": [
+                "org.mock-server:mockserver-netty"
+            ]
+        },
+        "org.mock-server:mockserver-netty": {
+            "locked": "3.10.4",
+            "transitive": [
+                "com.netflix.titus:titus-server-runtime"
+            ]
+        },
         "org.mockito:mockito-core": {
-            "locked": "2.21.0",
+            "locked": "2.23.0",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.titus:titus-testkit"
+            ]
+        },
+        "org.mozilla:rhino": {
+            "locked": "1.7R4",
+            "transitive": [
+                "com.github.fge:json-schema-core"
             ]
         },
         "org.objenesis:objenesis": {
@@ -6946,10 +9075,51 @@
                 "com.netflix.fenzo:fenzo-triggers"
             ]
         },
+        "org.reactivestreams:reactive-streams": {
+            "locked": "1.0.2",
+            "transitive": [
+                "com.github.akarnokd:rxjava2-interop",
+                "io.projectreactor:reactor-core",
+                "io.reactivex.rxjava2:rxjava"
+            ]
+        },
         "org.reflections:reflections": {
             "locked": "0.9.10",
             "transitive": [
                 "io.swagger:swagger-jaxrs"
+            ]
+        },
+        "org.scala-lang.modules:scala-parser-combinators_2.11": {
+            "locked": "1.0.4",
+            "transitive": [
+                "com.twitter:util-core_2.11"
+            ]
+        },
+        "org.scala-lang:scala-library": {
+            "locked": "2.11.7",
+            "transitive": [
+                "com.twitter:finagle-core_2.11",
+                "com.twitter:finagle-http_2.11",
+                "com.twitter:finagle-native_2.11",
+                "com.twitter:util-app_2.11",
+                "com.twitter:util-cache_2.11",
+                "com.twitter:util-codec_2.11",
+                "com.twitter:util-collection_2.11",
+                "com.twitter:util-core_2.11",
+                "com.twitter:util-function_2.11",
+                "com.twitter:util-hashing_2.11",
+                "com.twitter:util-jvm_2.11",
+                "com.twitter:util-lint_2.11",
+                "com.twitter:util-logging_2.11",
+                "com.twitter:util-registry_2.11",
+                "com.twitter:util-stats_2.11",
+                "org.scala-lang.modules:scala-parser-combinators_2.11"
+            ]
+        },
+        "org.skyscreamer:jsonassert": {
+            "locked": "1.2.3",
+            "transitive": [
+                "org.mock-server:mockserver-core"
             ]
         },
         "org.slf4j:jcl-over-slf4j": {
@@ -6963,6 +9133,7 @@
             "locked": "1.7.25",
             "requested": "1.7.0",
             "transitive": [
+                "ch.qos.logback:logback-classic",
                 "com.addthis.metrics:reporter-config-base",
                 "com.addthis.metrics:reporter-config3",
                 "com.datastax.cassandra:cassandra-driver-core",
@@ -6994,6 +9165,10 @@
                 "org.apache.zookeeper:zookeeper",
                 "org.caffinitas.ohc:ohc-core",
                 "org.cassandraunit:cassandra-unit",
+                "org.mock-server:mockserver-client-java",
+                "org.mock-server:mockserver-core",
+                "org.mock-server:mockserver-logging",
+                "org.mock-server:mockserver-netty",
                 "org.quartz-scheduler:quartz",
                 "org.slf4j:jcl-over-slf4j",
                 "org.slf4j:slf4j-log4j12"
@@ -7047,6 +9222,18 @@
                 "com.addthis.metrics:reporter-config3",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "xerces:xerces": {
+            "locked": "2.4.0",
+            "transitive": [
+                "org.mock-server:mockserver-core"
+            ]
+        },
+        "xerces:xercesImpl": {
+            "locked": "2.4.0",
+            "transitive": [
+                "xerces:xerces"
             ]
         }
     }

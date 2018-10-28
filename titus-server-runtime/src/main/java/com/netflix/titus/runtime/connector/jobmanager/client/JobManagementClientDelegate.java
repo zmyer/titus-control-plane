@@ -1,3 +1,19 @@
+/*
+ * Copyright 2018 Netflix, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.netflix.titus.runtime.connector.jobmanager.client;
 
 import com.netflix.titus.grpc.protogen.Job;
@@ -8,6 +24,7 @@ import com.netflix.titus.grpc.protogen.JobProcessesUpdate;
 import com.netflix.titus.grpc.protogen.JobQuery;
 import com.netflix.titus.grpc.protogen.JobQueryResult;
 import com.netflix.titus.grpc.protogen.JobStatusUpdate;
+import com.netflix.titus.grpc.protogen.ObserveJobsQuery;
 import com.netflix.titus.grpc.protogen.Task;
 import com.netflix.titus.grpc.protogen.TaskKillRequest;
 import com.netflix.titus.grpc.protogen.TaskQuery;
@@ -60,8 +77,8 @@ public class JobManagementClientDelegate implements JobManagementClient {
     }
 
     @Override
-    public Observable<JobChangeNotification> observeJobs() {
-        return delegate.observeJobs();
+    public Observable<JobChangeNotification> observeJobs(ObserveJobsQuery query) {
+        return delegate.observeJobs(query);
     }
 
     @Override

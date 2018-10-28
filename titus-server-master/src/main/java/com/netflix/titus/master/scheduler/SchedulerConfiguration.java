@@ -87,37 +87,8 @@ public interface SchedulerConfiguration {
     @DefaultValue("true")
     boolean isExitUponFenzoSchedulingErrorEnabled();
 
-    /**
-     * An option to enable fenzo autoscaling of agents.
-     *
-     * @return whether or not fenzo should autoscale agents.
-     */
-    @DefaultValue("false")
-    boolean isFenzoAutoScalingEnabled();
-
-    /**
-     * An option to enable fenzo downscaling of agents.
-     *
-     * @return whether or not fenzo should downscale agents.
-     */
-    @DefaultValue("true")
-    boolean isFenzoDownScalingEnabled();
-
     @DefaultValue("30000")
     long getTierSlaUpdateIntervalMs();
-
-    /**
-     * TODO: Remove this property once optimizing shortfall evaluator stabilizes
-     * Use the aggressive shortfall evaluator by default.
-     */
-    @DefaultValue("false")
-    boolean isOptimizingShortfallEvaluatorEnabled();
-
-    @DefaultValue("0")
-    int getDelayAutoScaleUpBySecs();
-
-    @DefaultValue("0")
-    int getDelayAutoScaleDownBySecs();
 
     /**
      * Return the attribute name to use to get the instance group id.
@@ -143,4 +114,10 @@ public interface SchedulerConfiguration {
      */
     @DefaultValue("300000")
     long getContainerFailureTrackingRetentionMs();
+
+    /**
+     * Whether to spread based on job in the Critical tier.
+     */
+    @DefaultValue("false")
+    boolean isCriticalTierJobSpreadingEnabled();
 }

@@ -1,13 +1,29 @@
+/*
+ * Copyright 2018 Netflix, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.netflix.titus.runtime.eviction.endpoint.grpc;
 
 import java.time.Duration;
+import java.util.Optional;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.netflix.titus.api.eviction.model.event.EvictionEvent;
 import com.netflix.titus.api.eviction.model.event.EvictionQuotaEvent;
 import com.netflix.titus.api.eviction.model.event.EvictionSnapshotEndEvent;
-import com.netflix.titus.api.eviction.model.event.SystemDisruptionBudgetUpdateEvent;
 import com.netflix.titus.api.eviction.model.event.TaskTerminationEvent;
 import com.netflix.titus.api.model.FixedIntervalTokenBucketRefillPolicy;
 import com.netflix.titus.api.model.TokenBucketRefillPolicy;
@@ -15,7 +31,6 @@ import com.netflix.titus.api.model.reference.TierReference;
 import com.netflix.titus.grpc.protogen.EvictionQuota;
 import com.netflix.titus.grpc.protogen.EvictionServiceEvent;
 import com.netflix.titus.grpc.protogen.Reference;
-import com.netflix.titus.grpc.protogen.SystemDisruptionBudget;
 import com.netflix.titus.grpc.protogen.TokenBucketPolicy;
 
 import static com.netflix.titus.runtime.endpoint.v3.grpc.GrpcAgentModelConverters.toCoreTier;
@@ -41,20 +56,6 @@ public final class GrpcEvictionModelConverters {
             });
 
     private GrpcEvictionModelConverters() {
-    }
-
-    public static com.netflix.titus.api.eviction.model.SystemDisruptionBudget toCoreSystemDisruptionBudget(SystemDisruptionBudget grpcEntity) {
-        return com.netflix.titus.api.eviction.model.SystemDisruptionBudget.newBuilder()
-                .withReference(toCoreReference(grpcEntity.getTarget()))
-                .withTokenBucketDescriptor(toCoreTokenBucketDescriptor(grpcEntity.getAdmissionControlPolicy()))
-                .build();
-    }
-
-    public static SystemDisruptionBudget toGrpcSystemDisruptionBudget(com.netflix.titus.api.eviction.model.SystemDisruptionBudget coreEntity) {
-        return SystemDisruptionBudget.newBuilder()
-                .setTarget(toGrpcReference(coreEntity.getReference()))
-                .setAdmissionControlPolicy(toGrpcTokenBucketPolicy(coreEntity.getTokenBucketPolicy()))
-                .build();
     }
 
     public static com.netflix.titus.api.model.reference.Reference toCoreReference(Reference grpcEntity) {
@@ -128,8 +129,6 @@ public final class GrpcEvictionModelConverters {
         switch (grpcEvent.getEventCase()) {
             case SNAPSHOTEND:
                 return EvictionEvent.newSnapshotEndEvent();
-            case SYSTEMDISRUPTIONBUDGETUPDATEEVENT:
-                return EvictionEvent.newSystemDisruptionBudgetEvent(toCoreSystemDisruptionBudget(grpcEvent.getSystemDisruptionBudgetUpdateEvent().getCurrent()));
             case EVICTIONQUOTAEVENT:
                 return EvictionEvent.newQuotaEvent(toCoreEvictionQuota(grpcEvent.getEvictionQuotaEvent().getQuota()));
             case TASKTERMINATIONEVENT:
@@ -139,40 +138,34 @@ public final class GrpcEvictionModelConverters {
         throw new IllegalArgumentException("No mapping for: " + grpcEvent);
     }
 
-    public static EvictionServiceEvent toGrpcEvent(EvictionEvent coreEvent) {
+    public static Optional<EvictionServiceEvent> toGrpcEvent(EvictionEvent coreEvent) {
         if (coreEvent instanceof EvictionSnapshotEndEvent) {
-            return EvictionServiceEvent.newBuilder()
+            EvictionServiceEvent grpcEvent = EvictionServiceEvent.newBuilder()
                     .setSnapshotEnd(EvictionServiceEvent.SnapshotEnd.getDefaultInstance())
                     .build();
-        }
-        if (coreEvent instanceof SystemDisruptionBudgetUpdateEvent) {
-            SystemDisruptionBudgetUpdateEvent actualEvent = (SystemDisruptionBudgetUpdateEvent) coreEvent;
-            return EvictionServiceEvent.newBuilder()
-                    .setSystemDisruptionBudgetUpdateEvent(EvictionServiceEvent.SystemDisruptionBudgetUpdateEvent.newBuilder()
-                            .setCurrent(toGrpcSystemDisruptionBudget(actualEvent.getSystemDisruptionBudget()))
-                            .build()
-                    )
-                    .build();
+            return Optional.of(grpcEvent);
         }
         if (coreEvent instanceof EvictionQuotaEvent) {
             EvictionQuotaEvent actualEvent = (EvictionQuotaEvent) coreEvent;
-            return EvictionServiceEvent.newBuilder()
+            EvictionServiceEvent grpcEvent = EvictionServiceEvent.newBuilder()
                     .setEvictionQuotaEvent(EvictionServiceEvent.EvictionQuotaEvent.newBuilder()
                             .setQuota(toGrpcEvictionQuota(actualEvent.getQuota()))
                             .build()
                     )
                     .build();
+            return Optional.of(grpcEvent);
         }
         if (coreEvent instanceof TaskTerminationEvent) {
             TaskTerminationEvent actualEvent = (TaskTerminationEvent) coreEvent;
-            return EvictionServiceEvent.newBuilder()
+            EvictionServiceEvent grpcEvent = EvictionServiceEvent.newBuilder()
                     .setTaskTerminationEvent(EvictionServiceEvent.TaskTerminationEvent.newBuilder()
                             .setTaskId(actualEvent.getTaskId())
                             .setApproved(actualEvent.isApproved())
                             .build()
                     )
                     .build();
+            return Optional.of(grpcEvent);
         }
-        throw new IllegalArgumentException("No GRPC mapping for: " + coreEvent);
+        return Optional.empty();
     }
 }

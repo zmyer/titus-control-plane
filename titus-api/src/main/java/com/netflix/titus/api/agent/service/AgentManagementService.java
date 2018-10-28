@@ -23,9 +23,7 @@ import java.util.function.Predicate;
 
 import com.netflix.titus.api.agent.model.AgentInstance;
 import com.netflix.titus.api.agent.model.AgentInstanceGroup;
-import com.netflix.titus.api.agent.model.AutoScaleRule;
 import com.netflix.titus.api.agent.model.InstanceGroupLifecycleStatus;
-import com.netflix.titus.api.agent.model.InstanceOverrideStatus;
 import com.netflix.titus.api.agent.model.event.AgentEvent;
 import com.netflix.titus.api.model.ResourceDimension;
 import com.netflix.titus.api.model.Tier;
@@ -34,48 +32,7 @@ import com.netflix.titus.common.util.tuple.Pair;
 import rx.Completable;
 import rx.Observable;
 
-public interface AgentManagementService {
-
-    /**
-     * Return all known agent instance groups.
-     */
-    List<AgentInstanceGroup> getInstanceGroups();
-
-    /**
-     * Get an agent instance group by id.
-     *
-     * @throws AgentManagementException {@link AgentManagementException.ErrorCode#InstanceGroupNotFound} if the instance group is not found
-     */
-    AgentInstanceGroup getInstanceGroup(String instanceGroupId);
-
-    /**
-     * Find an instance group by id.
-     */
-    Optional<AgentInstanceGroup> findInstanceGroup(String instanceGroupId);
-
-    /**
-     * Get all agents belonging to the given instance group.
-     *
-     * @throws AgentManagementException {@link AgentManagementException.ErrorCode#InstanceGroupNotFound} if the instance group is not found
-     */
-    List<AgentInstance> getAgentInstances(String instanceGroupId);
-
-    /**
-     * Get an agent instance by id.
-     *
-     * @throws AgentManagementException {@link AgentManagementException.ErrorCode#AgentNotFound} if the agent instance is not found
-     */
-    AgentInstance getAgentInstance(String instanceId);
-
-    /**
-     * Find an instance by id.
-     */
-    Optional<AgentInstance> findAgentInstance(String instanceId);
-
-    /**
-     * Find all agent instances matching a given filter.
-     */
-    List<Pair<AgentInstanceGroup, List<AgentInstance>>> findAgentInstances(Predicate<Pair<AgentInstanceGroup, AgentInstance>> filter);
+public interface AgentManagementService extends ReadOnlyAgentOperations {
 
     /**
      * For a given instance type, return the maximum amount of resources that can be allocated to a container.
@@ -96,13 +53,6 @@ public interface AgentManagementService {
     Completable updateInstanceGroupTier(String instanceGroupId, Tier tier);
 
     /**
-     * Associates a new auto scaling rule with a given instance group.
-     *
-     * @return AgentManagementException if the instance group is not found
-     */
-    Completable updateAutoScalingRule(String instanceGroupId, AutoScaleRule autoScaleRule);
-
-    /**
      * Changes lifecycle status of a instance group.
      *
      * @return AgentManagementException if the instance group is not found
@@ -115,6 +65,13 @@ public interface AgentManagementService {
      * @return AgentManagementException if the instance group is not found
      */
     Completable updateInstanceGroupAttributes(String instanceGroupId, Map<String, String> attributes);
+
+    /**
+     * Changes attributes of an agent instance.
+     *
+     * @return AgentManagementException if the agent instance is not found
+     */
+    Completable updateAgentInstanceAttributes(String instanceId, Map<String, String> attributes);
 
     /**
      * Updates instance group capacity. If only min value is provided, the desired size is adjusted to be no less than min.
@@ -142,20 +99,6 @@ public interface AgentManagementService {
      * @return AgentManagementException if the instance group is not found
      */
     Completable scaleUp(String instanceGroupId, int scaleUpCount);
-
-    /**
-     * Add/change override status of the given agent server.
-     *
-     * @return AgentManagementException if the instance group is not found
-     */
-    Completable updateInstanceOverride(String instanceId, InstanceOverrideStatus instanceOverrideStatus);
-
-    /**
-     * Remove status override of the given agent server.
-     *
-     * @return AgentManagementException if the instance group is not found
-     */
-    Completable removeInstanceOverride(String instanceId);
 
     /**
      * Terminate agents with the given instance ids. The agents must belong to the same instance group.

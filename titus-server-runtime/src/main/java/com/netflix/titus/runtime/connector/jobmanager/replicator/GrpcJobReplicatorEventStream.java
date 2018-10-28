@@ -1,3 +1,19 @@
+/*
+ * Copyright 2018 Netflix, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.netflix.titus.runtime.connector.jobmanager.replicator;
 
 import java.util.ArrayList;
@@ -10,8 +26,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.netflix.titus.api.jobmanager.model.job.Job;
 import com.netflix.titus.api.jobmanager.model.job.Task;
 import com.netflix.titus.common.runtime.TitusRuntime;
+import com.netflix.titus.common.util.rx.ReactorExt;
 import com.netflix.titus.grpc.protogen.JobChangeNotification;
 import com.netflix.titus.grpc.protogen.JobStatus;
+import com.netflix.titus.grpc.protogen.ObserveJobsQuery;
 import com.netflix.titus.grpc.protogen.TaskStatus;
 import com.netflix.titus.runtime.connector.common.replicator.AbstractReplicatorEventStream;
 import com.netflix.titus.runtime.connector.common.replicator.DataReplicatorMetrics;
@@ -20,8 +38,8 @@ import com.netflix.titus.runtime.connector.jobmanager.JobSnapshot;
 import com.netflix.titus.runtime.endpoint.v3.grpc.V3GrpcModelConverters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rx.Observable;
-import rx.Scheduler;
+import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Scheduler;
 
 public class GrpcJobReplicatorEventStream extends AbstractReplicatorEventStream<JobSnapshot> {
 
@@ -38,12 +56,13 @@ public class GrpcJobReplicatorEventStream extends AbstractReplicatorEventStream<
     }
 
     @Override
-    protected Observable<ReplicatorEvent<JobSnapshot>> newConnection() {
-        return Observable.fromCallable(CacheUpdater::new)
-                .flatMap(cacheUpdater -> {
-                    logger.info("Connecting to the job event stream...");
-                    return client.observeJobs().flatMap(cacheUpdater::onEvent);
-                });
+    protected Flux<ReplicatorEvent<JobSnapshot>> newConnection() {
+        return Flux.defer(() -> {
+            CacheUpdater cacheUpdater = new CacheUpdater();
+            logger.info("Connecting to the job event stream...");
+            return ReactorExt.toFlux(client.observeJobs(ObserveJobsQuery.getDefaultInstance()))
+                    .flatMap(cacheUpdater::onEvent);
+        });
     }
 
     private class CacheUpdater {
@@ -51,7 +70,7 @@ public class GrpcJobReplicatorEventStream extends AbstractReplicatorEventStream<
         private List<JobChangeNotification> snapshotEvents = new ArrayList<>();
         private AtomicReference<JobSnapshot> lastJobSnapshotRef = new AtomicReference<>();
 
-        private Observable<ReplicatorEvent<JobSnapshot>> onEvent(JobChangeNotification event) {
+        private Flux<ReplicatorEvent<JobSnapshot>> onEvent(JobChangeNotification event) {
             try {
                 if (lastJobSnapshotRef.get() != null) {
                     return processCacheUpdate(event);
@@ -74,12 +93,12 @@ public class GrpcJobReplicatorEventStream extends AbstractReplicatorEventStream<
                 }
             } catch (Exception e) {
                 logger.warn("Unexpected error when handling the job change notification: {}", event, e);
-                return Observable.error(e); // Return error to force the cache reconnect.
+                return Flux.error(e); // Return error to force the cache reconnect.
             }
-            return Observable.empty();
+            return Flux.empty();
         }
 
-        private Observable<ReplicatorEvent<JobSnapshot>> buildInitialCache() {
+        private Flux<ReplicatorEvent<JobSnapshot>> buildInitialCache() {
             Map<String, Job<?>> jobsById = new HashMap<>();
             Map<String, List<Task>> tasksByJobId = new HashMap<>();
 
@@ -109,10 +128,10 @@ public class GrpcJobReplicatorEventStream extends AbstractReplicatorEventStream<
 
             logger.info("Job snapshot loaded: jobs={}, tasks={}", initialSnapshot.getJobs().size(), initialSnapshot.getTasks().size());
 
-            return Observable.just(new ReplicatorEvent<>(initialSnapshot, titusRuntime.getClock().wallTime()));
+            return Flux.just(new ReplicatorEvent<>(initialSnapshot, titusRuntime.getClock().wallTime()));
         }
 
-        private Observable<ReplicatorEvent<JobSnapshot>> processCacheUpdate(JobChangeNotification event) {
+        private Flux<ReplicatorEvent<JobSnapshot>> processCacheUpdate(JobChangeNotification event) {
             JobSnapshot lastSnapshot = lastJobSnapshotRef.get();
             Optional<JobSnapshot> newSnapshot;
             switch (event.getNotificationCase()) {
@@ -135,9 +154,9 @@ public class GrpcJobReplicatorEventStream extends AbstractReplicatorEventStream<
             }
             if (newSnapshot.isPresent()) {
                 lastJobSnapshotRef.set(newSnapshot.get());
-                return Observable.just(new ReplicatorEvent<>(newSnapshot.get(), titusRuntime.getClock().wallTime()));
+                return Flux.just(new ReplicatorEvent<>(newSnapshot.get(), titusRuntime.getClock().wallTime()));
             }
-            return Observable.empty();
+            return Flux.empty();
         }
     }
 }
