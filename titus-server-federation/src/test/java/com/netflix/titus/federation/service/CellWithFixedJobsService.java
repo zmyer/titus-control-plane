@@ -1,3 +1,19 @@
+/*
+ * Copyright 2018 Netflix, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.netflix.titus.federation.service;
 
 import java.util.ArrayList;
@@ -21,6 +37,7 @@ import com.netflix.titus.grpc.protogen.JobId;
 import com.netflix.titus.grpc.protogen.JobManagementServiceGrpc;
 import com.netflix.titus.grpc.protogen.JobQuery;
 import com.netflix.titus.grpc.protogen.JobQueryResult;
+import com.netflix.titus.grpc.protogen.ObserveJobsQuery;
 import com.netflix.titus.runtime.endpoint.common.grpc.GrpcUtil;
 import com.netflix.titus.runtime.jobmanager.JobManagerCursors;
 import io.grpc.stub.StreamObserver;
@@ -91,7 +108,8 @@ class CellWithFixedJobsService extends JobManagementServiceGrpc.JobManagementSer
     }
 
     @Override
-    public void observeJobs(Empty request, StreamObserver<JobChangeNotification> responseObserver) {
+    public void observeJobs(ObserveJobsQuery query, StreamObserver<JobChangeNotification> responseObserver) {
+        // TODO: query criteria (filters) are not implemented
         for (Job job : jobsIndex.values()) {
             JobChangeNotification.JobUpdate update = JobChangeNotification.JobUpdate.newBuilder().setJob(job).build();
             JobChangeNotification notification = JobChangeNotification.newBuilder().setJobUpdate(update).build();

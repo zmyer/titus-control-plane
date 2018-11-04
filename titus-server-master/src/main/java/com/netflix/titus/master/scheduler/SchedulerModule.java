@@ -16,8 +16,6 @@
 
 package com.netflix.titus.master.scheduler;
 
-import java.util.Collections;
-import java.util.Map;
 import javax.inject.Singleton;
 
 import com.google.inject.AbstractModule;
@@ -25,8 +23,6 @@ import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.netflix.archaius.ConfigProxyFactory;
 import com.netflix.fenzo.PreferentialNamedConsumableResourceEvaluator;
-import com.netflix.fenzo.ScaleDownConstraintEvaluator;
-import com.netflix.fenzo.ScaleDownOrderEvaluator;
 import com.netflix.titus.api.scheduler.service.SchedulerService;
 import com.netflix.titus.common.util.tuple.Pair;
 import com.netflix.titus.grpc.protogen.SchedulerServiceGrpc;
@@ -40,10 +36,6 @@ import com.netflix.titus.master.scheduler.endpoint.grpc.DefaultSchedulerServiceG
 import com.netflix.titus.master.scheduler.fitness.networkinterface.TitusNetworkInterfaceFitnessEvaluator;
 import com.netflix.titus.master.scheduler.resourcecache.AgentResourceCache;
 import com.netflix.titus.master.scheduler.resourcecache.DefaultAgentResourceCache;
-import com.netflix.titus.master.scheduler.scaling.AutoScaleController;
-import com.netflix.titus.master.scheduler.scaling.DefaultAutoScaleController;
-import com.netflix.titus.master.scheduler.scaling.TitusActiveClusterScaleDownConstraintEvaluator;
-import com.netflix.titus.master.scheduler.scaling.ZoneBalancedClusterScaleDownConstraintEvaluator;
 import com.netflix.titus.master.scheduler.service.DefaultSchedulerService;
 
 
@@ -57,9 +49,7 @@ public final class SchedulerModule extends AbstractModule {
     protected void configure() {
         bind(VMOperations.class).to(VMOperationsImpl.class);
         bind(TierSlaUpdater.class).to(DefaultTierSlaUpdater.class);
-        bind(ScaleDownOrderEvaluator.class).to(TitusActiveClusterScaleDownConstraintEvaluator.class);
         bind(PreferentialNamedConsumableResourceEvaluator.class).to(TitusNetworkInterfaceFitnessEvaluator.class);
-        bind(AutoScaleController.class).to(DefaultAutoScaleController.class);
         bind(SchedulingService.class).to(DefaultSchedulingService.class).asEagerSingleton();
         bind(AgentResourceCache.class).to(DefaultAgentResourceCache.class);
 
@@ -78,12 +68,5 @@ public final class SchedulerModule extends AbstractModule {
     @Singleton
     public SchedulerConfiguration getSchedulerConfiguration(ConfigProxyFactory factory) {
         return factory.newProxy(SchedulerConfiguration.class);
-    }
-
-    @Provides
-    @Singleton
-    public Map<ScaleDownConstraintEvaluator, Double> getScaleDownConstraintEvaluators(
-            ZoneBalancedClusterScaleDownConstraintEvaluator zoneBalancedEvaluator) {
-        return Collections.singletonMap(zoneBalancedEvaluator, 1.0);
     }
 }

@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import com.google.protobuf.Empty;
+import com.netflix.titus.common.runtime.SystemLogService;
 import com.netflix.titus.grpc.protogen.Job;
 import com.netflix.titus.grpc.protogen.JobCapacityUpdate;
 import com.netflix.titus.grpc.protogen.JobChangeNotification;
@@ -30,12 +31,14 @@ import com.netflix.titus.grpc.protogen.JobProcessesUpdate;
 import com.netflix.titus.grpc.protogen.JobQuery;
 import com.netflix.titus.grpc.protogen.JobQueryResult;
 import com.netflix.titus.grpc.protogen.JobStatusUpdate;
+import com.netflix.titus.grpc.protogen.ObserveJobsQuery;
 import com.netflix.titus.grpc.protogen.Task;
 import com.netflix.titus.grpc.protogen.TaskId;
 import com.netflix.titus.grpc.protogen.TaskKillRequest;
 import com.netflix.titus.grpc.protogen.TaskQuery;
 import com.netflix.titus.grpc.protogen.TaskQueryResult;
 import com.netflix.titus.runtime.connector.jobmanager.JobManagementClient;
+import com.netflix.titus.runtime.endpoint.metadata.CallMetadataResolver;
 import io.grpc.stub.StreamObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +48,7 @@ import rx.Subscription;
 import static com.netflix.titus.runtime.endpoint.common.grpc.GrpcUtil.attachCancellingCallback;
 import static com.netflix.titus.runtime.endpoint.common.grpc.GrpcUtil.safeOnError;
 import static com.netflix.titus.runtime.endpoint.v3.grpc.TitusPaginationUtils.checkPageIsValid;
+import static com.netflix.titus.runtime.endpoint.v3.grpc.TitusPaginationUtils.logPageNumberUsage;
 
 @Singleton
 public class DefaultJobManagementServiceGrpc extends JobManagementServiceGrpc.JobManagementServiceImplBase {
@@ -52,10 +56,16 @@ public class DefaultJobManagementServiceGrpc extends JobManagementServiceGrpc.Jo
     private static final Logger logger = LoggerFactory.getLogger(DefaultJobManagementServiceGrpc.class);
 
     private final JobManagementClient jobManagementClient;
+    private final SystemLogService systemLog;
+    private final CallMetadataResolver callMetadataResolver;
 
     @Inject
-    public DefaultJobManagementServiceGrpc(JobManagementClient jobManagementClient) {
+    public DefaultJobManagementServiceGrpc(JobManagementClient jobManagementClient,
+                                           SystemLogService systemLog,
+                                           CallMetadataResolver callMetadataResolver) {
         this.jobManagementClient = jobManagementClient;
+        this.systemLog = systemLog;
+        this.callMetadataResolver = callMetadataResolver;
     }
 
     @Override
@@ -83,6 +93,7 @@ public class DefaultJobManagementServiceGrpc extends JobManagementServiceGrpc.Jo
         if (!checkPageIsValid(jobQuery.getPage(), responseObserver)) {
             return;
         }
+        logPageNumberUsage(systemLog, callMetadataResolver, getClass().getSimpleName(), "findJobs", jobQuery.getPage());
         Subscription subscription = jobManagementClient.findJobs(jobQuery).subscribe(
                 responseObserver::onNext,
                 e -> safeOnError(logger, e, responseObserver),
@@ -107,8 +118,8 @@ public class DefaultJobManagementServiceGrpc extends JobManagementServiceGrpc.Jo
     }
 
     @Override
-    public void observeJobs(Empty request, StreamObserver<JobChangeNotification> responseObserver) {
-        Subscription subscription = jobManagementClient.observeJobs().subscribe(
+    public void observeJobs(ObserveJobsQuery request, StreamObserver<JobChangeNotification> responseObserver) {
+        Subscription subscription = jobManagementClient.observeJobs(request).subscribe(
                 responseObserver::onNext,
                 e -> safeOnError(logger, e, responseObserver),
                 responseObserver::onCompleted
@@ -146,6 +157,7 @@ public class DefaultJobManagementServiceGrpc extends JobManagementServiceGrpc.Jo
         if (!checkPageIsValid(request.getPage(), responseObserver)) {
             return;
         }
+        logPageNumberUsage(systemLog, callMetadataResolver, getClass().getSimpleName(), "findTasks", request.getPage());
         Subscription subscription = jobManagementClient.findTasks(request).subscribe(
                 responseObserver::onNext,
                 e -> safeOnError(logger, e, responseObserver),

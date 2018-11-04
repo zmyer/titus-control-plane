@@ -375,7 +375,7 @@
     },
     "protobuf": {
         "com.netflix.titus:titus-api-definitions": {
-            "locked": "0.0.1-rc38",
+            "locked": "0.0.1-rc44",
             "requested": "0.0.1-rc+"
         }
     },
@@ -710,18 +710,28 @@
                 "io.grpc:grpc-core"
             ]
         },
+        "io.projectreactor:reactor-core": {
+            "locked": "3.1.11.RELEASE",
+            "transitive": [
+                "io.projectreactor:reactor-test"
+            ]
+        },
+        "io.projectreactor:reactor-test": {
+            "locked": "3.1.11.RELEASE",
+            "requested": "3.1.+"
+        },
         "junit:junit-dep": {
             "locked": "4.10",
             "requested": "4.10"
         },
         "net.bytebuddy:byte-buddy": {
-            "locked": "1.8.15",
+            "locked": "1.9.0",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
         },
         "net.bytebuddy:byte-buddy-agent": {
-            "locked": "1.8.15",
+            "locked": "1.9.0",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -746,7 +756,7 @@
             ]
         },
         "org.mockito:mockito-core": {
-            "locked": "2.21.0",
+            "locked": "2.23.0",
             "requested": "2.+"
         },
         "org.objenesis:objenesis": {
@@ -754,6 +764,12 @@
             "transitive": [
                 "com.jayway.awaitility:awaitility",
                 "org.mockito:mockito-core"
+            ]
+        },
+        "org.reactivestreams:reactive-streams": {
+            "locked": "1.0.2",
+            "transitive": [
+                "io.projectreactor:reactor-core"
             ]
         },
         "org.slf4j:slf4j-api": {
@@ -862,18 +878,28 @@
                 "io.grpc:grpc-core"
             ]
         },
+        "io.projectreactor:reactor-core": {
+            "locked": "3.1.11.RELEASE",
+            "transitive": [
+                "io.projectreactor:reactor-test"
+            ]
+        },
+        "io.projectreactor:reactor-test": {
+            "locked": "3.1.11.RELEASE",
+            "requested": "3.1.+"
+        },
         "junit:junit-dep": {
             "locked": "4.10",
             "requested": "4.10"
         },
         "net.bytebuddy:byte-buddy": {
-            "locked": "1.8.15",
+            "locked": "1.9.0",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
         },
         "net.bytebuddy:byte-buddy-agent": {
-            "locked": "1.8.15",
+            "locked": "1.9.0",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -898,7 +924,7 @@
             ]
         },
         "org.mockito:mockito-core": {
-            "locked": "2.21.0",
+            "locked": "2.23.0",
             "requested": "2.+"
         },
         "org.objenesis:objenesis": {
@@ -906,6 +932,12 @@
             "transitive": [
                 "com.jayway.awaitility:awaitility",
                 "org.mockito:mockito-core"
+            ]
+        },
+        "org.reactivestreams:reactive-streams": {
+            "locked": "1.0.2",
+            "transitive": [
+                "io.projectreactor:reactor-core"
             ]
         },
         "org.slf4j:slf4j-api": {
@@ -1014,6 +1046,16 @@
                 "io.grpc:grpc-core"
             ]
         },
+        "io.projectreactor:reactor-core": {
+            "locked": "3.1.11.RELEASE",
+            "transitive": [
+                "io.projectreactor:reactor-test"
+            ]
+        },
+        "io.projectreactor:reactor-test": {
+            "locked": "3.1.11.RELEASE",
+            "requested": "3.1.+"
+        },
         "junit:junit-dep": {
             "locked": "4.10",
             "requested": "4.10"
@@ -1025,13 +1067,13 @@
             ]
         },
         "net.bytebuddy:byte-buddy": {
-            "locked": "1.8.15",
+            "locked": "1.9.0",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
         },
         "net.bytebuddy:byte-buddy-agent": {
-            "locked": "1.8.15",
+            "locked": "1.9.0",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -1056,7 +1098,7 @@
             ]
         },
         "org.mockito:mockito-core": {
-            "locked": "2.21.0",
+            "locked": "2.23.0",
             "requested": "2.+"
         },
         "org.objenesis:objenesis": {
@@ -1064,6 +1106,12 @@
             "transitive": [
                 "com.jayway.awaitility:awaitility",
                 "org.mockito:mockito-core"
+            ]
+        },
+        "org.reactivestreams:reactive-streams": {
+            "locked": "1.0.2",
+            "transitive": [
+                "io.projectreactor:reactor-core"
             ]
         },
         "org.slf4j:slf4j-api": {
@@ -1179,6 +1227,16 @@
                 "io.grpc:grpc-core"
             ]
         },
+        "io.projectreactor:reactor-core": {
+            "locked": "3.1.11.RELEASE",
+            "transitive": [
+                "io.projectreactor:reactor-test"
+            ]
+        },
+        "io.projectreactor:reactor-test": {
+            "locked": "3.1.11.RELEASE",
+            "requested": "3.1.+"
+        },
         "junit:junit-dep": {
             "locked": "4.10",
             "requested": "4.10"
@@ -1190,13 +1248,13 @@
             ]
         },
         "net.bytebuddy:byte-buddy": {
-            "locked": "1.8.15",
+            "locked": "1.9.0",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
         },
         "net.bytebuddy:byte-buddy-agent": {
-            "locked": "1.8.15",
+            "locked": "1.9.0",
             "transitive": [
                 "org.mockito:mockito-core"
             ]
@@ -1221,7 +1279,7 @@
             ]
         },
         "org.mockito:mockito-core": {
-            "locked": "2.21.0",
+            "locked": "2.23.0",
             "requested": "2.+"
         },
         "org.objenesis:objenesis": {
@@ -1229,6 +1287,12 @@
             "transitive": [
                 "com.jayway.awaitility:awaitility",
                 "org.mockito:mockito-core"
+            ]
+        },
+        "org.reactivestreams:reactive-streams": {
+            "locked": "1.0.2",
+            "transitive": [
+                "io.projectreactor:reactor-core"
             ]
         },
         "org.slf4j:slf4j-api": {

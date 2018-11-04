@@ -1,3 +1,19 @@
+/*
+ * Copyright 2018 Netflix, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.netflix.titus.master.eviction.endpoint.grpc;
 
 import javax.inject.Inject;
@@ -9,19 +25,17 @@ import com.netflix.titus.grpc.protogen.EvictionServiceEvent;
 import com.netflix.titus.grpc.protogen.EvictionServiceGrpc;
 import com.netflix.titus.grpc.protogen.ObserverEventRequest;
 import com.netflix.titus.grpc.protogen.Reference;
-import com.netflix.titus.grpc.protogen.SystemDisruptionBudget;
 import com.netflix.titus.grpc.protogen.TaskTerminateRequest;
 import com.netflix.titus.grpc.protogen.TaskTerminateResponse;
-import com.netflix.titus.runtime.eviction.endpoint.grpc.GrpcEvictionModelConverters;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.ServerCallStreamObserver;
 import io.grpc.stub.StreamObserver;
-import rx.Subscription;
+import reactor.core.Disposable;
 
 import static com.netflix.titus.runtime.endpoint.v3.grpc.GrpcAgentModelConverters.toCoreTier;
+import static com.netflix.titus.runtime.eviction.endpoint.grpc.GrpcEvictionModelConverters.toGrpcEvent;
 import static com.netflix.titus.runtime.eviction.endpoint.grpc.GrpcEvictionModelConverters.toGrpcEvictionQuota;
-import static com.netflix.titus.runtime.eviction.endpoint.grpc.GrpcEvictionModelConverters.toGrpcSystemDisruptionBudget;
 
 @Singleton
 public class GrpcEvictionService extends EvictionServiceGrpc.EvictionServiceImplBase {
@@ -31,30 +45,6 @@ public class GrpcEvictionService extends EvictionServiceGrpc.EvictionServiceImpl
     @Inject
     public GrpcEvictionService(EvictionOperations evictionOperations) {
         this.evictionOperations = evictionOperations;
-    }
-
-    @Override
-    public void getDisruptionBudget(Reference request, StreamObserver<SystemDisruptionBudget> responseObserver) {
-        com.netflix.titus.api.eviction.model.SystemDisruptionBudget budget;
-        switch (request.getReferenceCase()) {
-            case GLOBAL:
-                budget = evictionOperations.getGlobalDisruptionBudget();
-                break;
-            case TIER:
-                budget = evictionOperations.getTierDisruptionBudget(toCoreTier(request.getTier()));
-                break;
-            case CAPACITYGROUP:
-                budget = evictionOperations.getCapacityGroupDisruptionBudget(request.getCapacityGroup());
-                break;
-            case JOBID:
-            case TASKID:
-            default:
-                responseObserver.onError(new IllegalArgumentException("Reference type not supported: " + request.getReferenceCase()));
-                return;
-        }
-
-        responseObserver.onNext(toGrpcSystemDisruptionBudget(budget));
-        responseObserver.onCompleted();
     }
 
     @Override
@@ -84,6 +74,9 @@ public class GrpcEvictionService extends EvictionServiceGrpc.EvictionServiceImpl
     @Override
     public void terminateTask(TaskTerminateRequest request, StreamObserver<TaskTerminateResponse> responseObserver) {
         evictionOperations.terminateTask(request.getTaskId(), request.getReason()).subscribe(
+                next -> {
+                },
+                responseObserver::onError,
                 () -> {
                     responseObserver.onNext(TaskTerminateResponse.newBuilder()
                             .setAllowed(true)
@@ -92,15 +85,14 @@ public class GrpcEvictionService extends EvictionServiceGrpc.EvictionServiceImpl
                             .build()
                     );
                     responseObserver.onCompleted();
-                },
-                responseObserver::onError
+                }
         );
     }
 
     @Override
     public void observeEvents(ObserverEventRequest request, StreamObserver<EvictionServiceEvent> responseObserver) {
-        Subscription subscription = evictionOperations.events(request.getIncludeSnapshot()).subscribe(
-                next -> responseObserver.onNext(GrpcEvictionModelConverters.toGrpcEvent(next)),
+        Disposable subscription = evictionOperations.events(request.getIncludeSnapshot()).subscribe(
+                next -> toGrpcEvent(next).ifPresent(responseObserver::onNext),
                 e -> responseObserver.onError(
                         new StatusRuntimeException(Status.INTERNAL
                                 .withDescription("Eviction event stream terminated with an error")
@@ -109,6 +101,6 @@ public class GrpcEvictionService extends EvictionServiceGrpc.EvictionServiceImpl
                 responseObserver::onCompleted
         );
         ServerCallStreamObserver<EvictionServiceEvent> serverObserver = (ServerCallStreamObserver<EvictionServiceEvent>) responseObserver;
-        serverObserver.setOnCancelHandler(subscription::unsubscribe);
+        serverObserver.setOnCancelHandler(subscription::dispose);
     }
 }

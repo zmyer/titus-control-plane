@@ -18,15 +18,20 @@ package com.netflix.titus.testkit.embedded.cell.gateway;
 
 import java.util.Properties;
 
+import com.google.common.base.Preconditions;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
+import com.google.inject.TypeLiteral;
 import com.google.inject.util.Modules;
 import com.netflix.archaius.config.DefaultSettableConfig;
 import com.netflix.archaius.guice.ArchaiusModule;
 import com.netflix.governator.InjectorBuilder;
 import com.netflix.governator.LifecycleInjector;
-import com.netflix.governator.guice.jetty.Archaius2JettyModule;
+import com.netflix.titus.api.jobmanager.model.job.JobDescriptor;
+import com.netflix.titus.api.jobmanager.model.job.validator.PassJobValidator;
 import com.netflix.titus.api.jobmanager.store.JobStore;
+import com.netflix.titus.common.model.validator.EntityValidator;
+import com.netflix.titus.gateway.endpoint.v3.grpc.TitusGatewayGrpcServer;
 import com.netflix.titus.gateway.startup.TitusGatewayModule;
 import com.netflix.titus.grpc.protogen.AgentManagementServiceGrpc;
 import com.netflix.titus.grpc.protogen.AutoScalingServiceGrpc;
@@ -34,12 +39,12 @@ import com.netflix.titus.grpc.protogen.HealthGrpc;
 import com.netflix.titus.grpc.protogen.JobManagementServiceGrpc;
 import com.netflix.titus.grpc.protogen.LoadBalancerServiceGrpc;
 import com.netflix.titus.master.TitusMaster;
-import com.netflix.titus.runtime.endpoint.metadata.CallMetadata;
+import com.netflix.titus.runtime.endpoint.common.rest.EmbeddedJettyModule;
 import com.netflix.titus.runtime.endpoint.metadata.V3HeaderInterceptor;
-import com.netflix.titus.testkit.util.NetworkExt;
+import com.netflix.titus.testkit.embedded.cell.master.EmbeddedTitusMaster;
 import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 import io.grpc.Metadata;
+import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
 import io.grpc.stub.AbstractStub;
 import io.grpc.stub.MetadataUtils;
 import org.slf4j.Logger;
@@ -54,28 +59,34 @@ public class EmbeddedTitusGateway {
 
     private static final Logger logger = LoggerFactory.getLogger(EmbeddedTitusGateway.class);
 
-    private static final CallMetadata CALL_METADATA = CallMetadata.newBuilder().withCallerId("gatewayClient").build();
-
+    private final EmbeddedTitusMaster embeddedTitusMaster;
     private final String masterGrpcHost;
-    private final int masterGrpcPort;
-    private final int masterHttpPort;
+    private int masterGrpcPort;
+    private int masterHttpPort;
 
-    private final int httpPort;
+    private int httpPort;
     private final int grpcPort;
     private final boolean enableREST;
     private final JobStore store;
     private final Properties properties;
 
     private final DefaultSettableConfig config;
+    private final EntityValidator<JobDescriptor> validator;
 
     private LifecycleInjector injector;
 
     private ManagedChannel grpcChannel;
 
     public EmbeddedTitusGateway(Builder builder) {
-        this.masterGrpcHost = getOrDefault(builder.masterGrpcHost, "localhost");
-        this.masterGrpcPort = builder.masterGrpcPort;
-        this.masterHttpPort = builder.masterHttpPort;
+        this.embeddedTitusMaster = builder.embeddedTitusMaster;
+        if (embeddedTitusMaster == null) {
+            this.masterGrpcHost = getOrDefault(builder.masterGrpcHost, "localhost");
+            this.masterGrpcPort = builder.masterGrpcPort;
+            this.masterHttpPort = builder.masterHttpPort;
+        } else {
+            this.masterGrpcHost = "localhost";
+        }
+
         this.httpPort = builder.httpPort;
         this.grpcPort = builder.grpcPort;
         this.enableREST = builder.enableREST;
@@ -85,14 +96,11 @@ public class EmbeddedTitusGateway {
         this.config = new DefaultSettableConfig();
         this.config.setProperties(properties);
 
+        this.validator = builder.validator;
+
         String resourceDir = TitusMaster.class.getClassLoader().getResource("static").toExternalForm();
         Properties props = new Properties();
-        props.put("titusMaster.v2Enabled", Boolean.toString(builder.v2Enabled));
-        props.put("titus.masterClient.masterIp", masterGrpcHost);
-        props.put("titus.masterClient.masterGrpcPort", masterGrpcPort);
-        props.put("titus.masterClient.masterHttpPort", masterHttpPort);
         props.put("titusGateway.endpoint.grpc.port", grpcPort);
-        props.put("governator.jetty.embedded.port", httpPort);
         props.put("governator.jetty.embedded.webAppResourceBase", resourceDir);
         props.put("titusMaster.job.configuration.defaultSecurityGroups", "sg-12345,sg-34567");
         props.put("titusMaster.job.configuration.defaultIamRole", "iam-12345");
@@ -101,7 +109,8 @@ public class EmbeddedTitusGateway {
     }
 
     public int getGrpcPort() {
-        return grpcPort;
+        Preconditions.checkNotNull(injector, "Gateway not started yet");
+        return injector.getInstance(TitusGatewayGrpcServer.class).getPort();
     }
 
     public EmbeddedTitusGateway boot() {
@@ -112,6 +121,17 @@ public class EmbeddedTitusGateway {
                 new ArchaiusModule() {
                     @Override
                     protected void configureArchaius() {
+                        config.setProperty("titus.masterClient.masterIp", masterGrpcHost);
+
+                        if (embeddedTitusMaster == null) {
+                            config.setProperty("titus.masterClient.masterGrpcPort", masterGrpcPort);
+                            config.setProperty("titus.masterClient.masterHttpPort", masterHttpPort);
+                        } else {
+                            // In the embedded mode, master cannot run jetty, so we set only GRPC port.
+                            config.setProperty("titus.masterClient.masterGrpcPort", embeddedTitusMaster.getGrpcPort());
+                            config.setProperty("titus.masterClient.masterHttpPort", "0");
+                        }
+
                         bindApplicationConfigurationOverride().toInstance(config);
                     }
                 },
@@ -121,6 +141,8 @@ public class EmbeddedTitusGateway {
                         if (store != null) {
                             bind(JobStore.class).toInstance(store);
                         }
+
+                        bind(new TypeLiteral<EntityValidator<JobDescriptor>>() {}).toInstance(validator);
                     }
                 })
         ).createInjector();
@@ -128,7 +150,10 @@ public class EmbeddedTitusGateway {
     }
 
     private Module newJettyModule() {
-        return enableREST ? new Archaius2JettyModule() : Modules.EMPTY_MODULE;
+        if (!enableREST) {
+            return Modules.EMPTY_MODULE;
+        }
+        return new EmbeddedJettyModule(httpPort);
     }
 
     public EmbeddedTitusGateway shutdown() {
@@ -179,8 +204,9 @@ public class EmbeddedTitusGateway {
 
     private ManagedChannel getOrCreateGrpcChannel() {
         if (grpcChannel == null) {
-            this.grpcChannel = ManagedChannelBuilder.forAddress("localhost", grpcPort)
+            this.grpcChannel = NettyChannelBuilder.forAddress("localhost", getGrpcPort())
                     .usePlaintext(true)
+                    .maxHeaderListSize(65536)
                     .build();
         }
         return grpcChannel;
@@ -198,6 +224,7 @@ public class EmbeddedTitusGateway {
         return aDefaultTitusGateway()
                 .withStore(store)
                 .withMasterEndpoint(masterGrpcHost, masterGrpcPort, masterHttpPort)
+                .withMaster(embeddedTitusMaster)
                 .withHttpPort(httpPort)
                 .withGrpcPort(grpcPort)
                 .withProperties(properties);
@@ -218,19 +245,18 @@ public class EmbeddedTitusGateway {
         private boolean enableREST = true;
         private JobStore store;
         private Properties properties = new Properties();
-
-        // Enable V2 engine by default
-        private boolean v2Enabled = true;
-
-        public Builder withV2Engine(boolean v2Enabled) {
-            this.v2Enabled = v2Enabled;
-            return this;
-        }
+        private EntityValidator<JobDescriptor> validator = new PassJobValidator();
+        private EmbeddedTitusMaster embeddedTitusMaster;
 
         public Builder withMasterEndpoint(String host, int grpcPort, int httpPort) {
             this.masterGrpcHost = host;
             this.masterGrpcPort = grpcPort;
             this.masterHttpPort = httpPort;
+            return this;
+        }
+
+        public Builder withMaster(EmbeddedTitusMaster embeddedTitusMaster) {
+            this.embeddedTitusMaster = embeddedTitusMaster;
             return this;
         }
 
@@ -264,10 +290,12 @@ public class EmbeddedTitusGateway {
             return this;
         }
 
-        public EmbeddedTitusGateway build() {
-            httpPort = httpPort == 0 ? NetworkExt.findUnusedPort() : httpPort;
-            grpcPort = grpcPort == 0 ? NetworkExt.findUnusedPort() : grpcPort;
+        public Builder withJobValidator(EntityValidator<JobDescriptor> validator) {
+            this.validator = validator;
+            return this;
+        }
 
+        public EmbeddedTitusGateway build() {
             return new EmbeddedTitusGateway(this);
         }
     }

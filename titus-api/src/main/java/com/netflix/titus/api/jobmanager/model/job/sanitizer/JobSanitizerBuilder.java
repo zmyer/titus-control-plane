@@ -49,7 +49,7 @@ public class JobSanitizerBuilder {
         return this;
     }
 
-    public JobSanitizerBuilder withJobConstrainstConfiguration(JobConfiguration jobConfiguration) {
+    public JobSanitizerBuilder withJobConstraintConfiguration(JobConfiguration jobConfiguration) {
         this.jobConfiguration = jobConfiguration;
         return this;
     }
@@ -82,7 +82,7 @@ public class JobSanitizerBuilder {
                     return Optional.empty();
                 })
                 .registerBean("constraints", jobConfiguration)
-                .registerBean("asserts", new JobAssertions(maxContainerSizeResolver));
+                .registerBean("asserts", new JobAssertions(jobConfiguration, maxContainerSizeResolver));
 
         return sanitizerBuilder.build();
     }

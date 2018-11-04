@@ -327,6 +327,28 @@ public final class CollectionsExt {
         return Pair.of(matching, notMatching);
     }
 
+    public static <T, R> Set<R> transformSet(Set<T> source, Function<T, R> transformer) {
+        if (isNullOrEmpty(source)) {
+            return Collections.emptySet();
+        }
+
+        Set<R> result = new HashSet<>(source.size());
+        for (T item : source) {
+            result.add(transformer.apply(item));
+        }
+        return result;
+    }
+
+    public static <K, V, R> Map<K, R> transformValues(Map<K, V> source, Function<V, R> transformer) {
+        if (isNullOrEmpty(source)) {
+            return Collections.emptyMap();
+        }
+
+        Map<K, R> result = new HashMap<>();
+        source.forEach((k, v) -> result.put(k, transformer.apply(v)));
+        return result;
+    }
+
     @SafeVarargs
     public static <T> Set<T> asSet(T... values) {
         Set<T> newSet = new HashSet<>();
@@ -459,6 +481,23 @@ public final class CollectionsExt {
             }
         }
         return true;
+    }
+
+    /**
+     * @return true when the <tt>map</tt> contains any of the keys
+     */
+    @SafeVarargs
+    public static <T> boolean containsAnyKeys(Map<T, ?> map, T... keys) {
+        if (map == null) {
+            return false;
+        }
+
+        for (T key : keys) {
+            if (map.containsKey(key)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

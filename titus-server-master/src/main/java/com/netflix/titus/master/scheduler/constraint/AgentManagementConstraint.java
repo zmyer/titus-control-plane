@@ -31,11 +31,11 @@ import com.netflix.titus.api.agent.model.AgentInstance;
 import com.netflix.titus.api.agent.model.AgentInstanceGroup;
 import com.netflix.titus.api.agent.model.InstanceGroupLifecycleState;
 import com.netflix.titus.api.agent.model.InstanceLifecycleState;
-import com.netflix.titus.api.agent.model.InstanceOverrideState;
 import com.netflix.titus.api.agent.service.AgentManagementService;
 import com.netflix.titus.api.agent.service.AgentStatusMonitor;
 import com.netflix.titus.api.model.Tier;
 import com.netflix.titus.common.util.CollectionsExt;
+import com.netflix.titus.master.agent.AgentAttributes;
 import com.netflix.titus.master.scheduler.SchedulerConfiguration;
 
 import static com.netflix.titus.master.scheduler.SchedulerUtils.getAttributeValueOrEmptyString;
@@ -57,11 +57,17 @@ public class AgentManagementConstraint implements SystemConstraint {
     private static final Result INSTANCE_GROUP_DOES_NOT_HAVE_GPUS = new Result(false, "Instance group does not have gpus");
     private static final Result INSTANCE_GROUP_CANNOT_RUN_NON_GPU_TASKS = new Result(false, "Instance group does not run non gpu tasks");
 
+    private static final Result INSTANCE_GROUP_NO_PLACEMENT = new Result(false, "Cannot place on instance group due to noPlacement attribute");
+
     private static final Result MISSING_INSTANCE_ATTRIBUTE = new Result(false, "Missing instance attribute");
     private static final Result INSTANCE_NOT_FOUND = new Result(false, "Instance not found");
     private static final Result INSTANCE_NOT_STARTED = new Result(false, "Instance not in Started state");
-    private static final Result INSTANCE_STATE_IS_OVERRIDDEN = new Result(false, "Instance state is overridden");
     private static final Result INSTANCE_UNHEALTHY = new Result(false, "Unhealthy agent");
+
+    private static final Result INSTANCE_NO_PLACEMENT = new Result(false, "Cannot place on instance due to noPlacement agent attribute");
+    private static final Result INSTANCE_REMOVABLE = new Result(false, "Cannot place on instance due to removable agent attribute");
+    private static final Result INSTANCE_EVICTABLE = new Result(false, "Cannot place on instance due to evictable agent attribute");
+    private static final Result INSTANCE_EVICTABLE_IMMEDIATELY = new Result(false, "Cannot place on instance due to evictableImmediately agent attribute");
 
     private static final Result TRUE_RESULT = new Result(true, null);
 
@@ -75,8 +81,11 @@ public class AgentManagementConstraint implements SystemConstraint {
             MISSING_INSTANCE_ATTRIBUTE.getFailureReason(),
             INSTANCE_NOT_FOUND.getFailureReason(),
             INSTANCE_NOT_STARTED.getFailureReason(),
-            INSTANCE_STATE_IS_OVERRIDDEN.getFailureReason(),
-            INSTANCE_UNHEALTHY.getFailureReason()
+            INSTANCE_UNHEALTHY.getFailureReason(),
+            INSTANCE_NO_PLACEMENT.getFailureReason(),
+            INSTANCE_REMOVABLE.getFailureReason(),
+            INSTANCE_EVICTABLE.getFailureReason(),
+            INSTANCE_EVICTABLE_IMMEDIATELY.getFailureReason()
     );
 
     private final SchedulerConfiguration schedulerConfiguration;
@@ -136,6 +145,11 @@ public class AgentManagementConstraint implements SystemConstraint {
             return INSTANCE_GROUP_NOT_ACTIVE;
         }
 
+        Result instanceGroupAttributesResult = evaluateInstanceGroupAttributes(instanceGroup);
+        if (instanceGroupAttributesResult != TRUE_RESULT) {
+            return instanceGroupAttributesResult;
+        }
+
         Tier tier = getTier((QueuableTask) taskRequest);
         if (instanceGroup.getTier() != tier) {
             return INSTANCE_GROUP_TIER_MISMATCH;
@@ -171,9 +185,9 @@ public class AgentManagementConstraint implements SystemConstraint {
             return INSTANCE_NOT_STARTED;
         }
 
-        InstanceOverrideState overrideState = instance.getOverrideStatus().getState();
-        if (overrideState != InstanceOverrideState.None) {
-            return INSTANCE_STATE_IS_OVERRIDDEN;
+        Result instanceAttributesResult = evaluateAgentInstanceAttributes(instance);
+        if (instanceAttributesResult != TRUE_RESULT) {
+            return instanceAttributesResult;
         }
 
         if (!agentStatusMonitor.isHealthy(instanceId)) {
@@ -190,5 +204,39 @@ public class AgentManagementConstraint implements SystemConstraint {
             return gpu != null && gpu >= 1.0;
         }
         return false;
+    }
+
+    private Result evaluateInstanceGroupAttributes(AgentInstanceGroup instanceGroup) {
+        Map<String, String> attributes = instanceGroup.getAttributes();
+        boolean noPlacement = Boolean.parseBoolean(attributes.get(AgentAttributes.NO_PLACEMENT));
+        if (noPlacement) {
+            return INSTANCE_GROUP_NO_PLACEMENT;
+        }
+
+        return TRUE_RESULT;
+    }
+
+    private Result evaluateAgentInstanceAttributes(AgentInstance agentInstance) {
+        Map<String, String> attributes = agentInstance.getAttributes();
+        boolean noPlacement = Boolean.parseBoolean(attributes.get(AgentAttributes.NO_PLACEMENT));
+        if (noPlacement) {
+            return INSTANCE_NO_PLACEMENT;
+        }
+
+        boolean removable = attributes.containsKey(AgentAttributes.REMOVABLE);
+        if (removable) {
+            return INSTANCE_REMOVABLE;
+        }
+
+        boolean evictable = Boolean.parseBoolean(attributes.get(AgentAttributes.EVICTABLE));
+        if (evictable) {
+            return INSTANCE_EVICTABLE;
+        }
+
+        boolean evictableImmediately = Boolean.parseBoolean(attributes.get(AgentAttributes.EVICTABLE_IMMEDIATELY));
+        if (evictableImmediately) {
+            return INSTANCE_EVICTABLE_IMMEDIATELY;
+        }
+        return TRUE_RESULT;
     }
 }
