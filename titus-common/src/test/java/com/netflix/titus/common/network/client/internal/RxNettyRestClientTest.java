@@ -72,10 +72,12 @@ public class RxNettyRestClientTest {
             return response.writeAndFlush(toByteBuf(actual));
         };
 
+        /*
         runHttpAndHttps(requestHandler, () -> {
             MyEntity result = client.doGET("/path", TypeProviders.of(MyEntity.class)).toBlocking().first();
             assertThat(result).isEqualTo(actual);
         });
+        */
     }
 
     @Test(timeout = 30_000)

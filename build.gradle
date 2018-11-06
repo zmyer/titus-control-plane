@@ -9,6 +9,7 @@ buildscript {
     dependencies {
         classpath 'com.netflix.nebula:gradle-netflixoss-project-plugin:5.0.0'
         classpath 'com.netflix.nebula:nebula-ospackage-plugin:3.+'
+        classpath "com.netflix.nebula:gradle-dependency-lock-plugin:7.0.1"
     }
 }
 
@@ -19,11 +20,13 @@ allprojects {
 
     if (project.hasProperty('useMavenLocal')) {
         repositories {
+            maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
             mavenLocal()
         }
     }
 
     repositories {
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
         jcenter()
         maven { url 'https://dl.bintray.com/netflixoss/oss-candidate/' }
     }
@@ -55,7 +58,7 @@ subprojects {
         rxnettyVersion = '0.4.+'
         hdrhistogramVersion = '2.1.+'
         apacheCommonsCliVersion = '1.3.+'
-        archaius2Version = '2.3.+'
+        archaius2Version = '2.3.13'
         eurekaVersion = '1.+'
         numerusVersion = '1.1'
         snappyVersion = '1.1.+'
@@ -66,10 +69,10 @@ subprojects {
         governatorVersion = '1.15.+'
         jettyVersion = '9.2.12.v20150709'
         jerseyVersion = '1.19.1'
-        fenzoVersion = '1.1.0-rc.3'
+        fenzoVersion = '1.0.1'
         spectatorVersion = '0.59.+'
         mesosVersion = '1.4.2'
-        protobufVersion = '3.5.+'
+        protobufVersion = '3.6.1'
         springReactor = '3.1.+'
         springReactorNetty = '0.7.+'
         grpcVersion = '1.10.+'
